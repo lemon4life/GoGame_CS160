@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
-#include <fstream> // Required for file I/O
+#include <fstream>
 
 // --- Constants ---
 const int BOARD_SIZE = 9;
@@ -19,11 +19,22 @@ const float CELL_SIZE = (WINDOW_HEIGHT - 2 * GRID_OFFSET) / (BOARD_SIZE - 1.0f);
 // --- UI Constants ---
 const int BUTTON_HEIGHT = 40;
 const int BUTTON_PADDING = 10;
-const int BUTTON_START_X = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING;
-const int BUTTON_START_Y = GRID_OFFSET;
+const int BUTTON_START_X_GAME_UI = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING; // Specific for in-game UI
+const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
+
+// --- Main Menu Specific Constants ---
+const int MENU_BUTTON_WIDTH = 250;
+const int MENU_BUTTON_HEIGHT = 50;
+const int MENU_BUTTON_START_X = 100; // Left side for menu buttons
+const int MENU_BUTTON_START_Y = 250; // Starting Y position for first menu button
+const int MENU_TITLE_Y = 80;
+
 
 // Enum for stone types
 enum class Stone { Empty, Black, White };
+
+// Enum for overall game state
+enum class GameState { MENU, PLAYING, SETTINGS, EXIT };
 
 // Struct to record a move for Undo/Redo
 struct Move {
@@ -46,7 +57,6 @@ private:
 
 public:
     StoneTextureManager() {
-        // Ensure these files exist in cmake-build-debug/assets/img/
         if (!blackStoneTexture.loadFromFile("assets/img/blackstone.png")) {
             std::cerr << "Error loading black stone texture." << std::endl;
             std::exit(1);
@@ -69,7 +79,6 @@ private:
     std::vector<std::vector<Stone>> board;
     Stone current_player;
 
-    // History for Undo/Redo
     std::vector<Move> undoHistory;
     std::vector<Move> redoHistory;
 
@@ -87,18 +96,13 @@ public:
     }
 
     bool placeStone(int x, int y) {
-        // 1. Check validity
         if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE || board[y][x] != Stone::Empty)
             return false;
 
-        // 2. Record the move for Undo
         Move move = {x, y, current_player};
         undoHistory.push_back(move);
-
-        // 3. Clear Redo history (cannot redo after making a new move)
         redoHistory.clear();
 
-        // 4. Place stone and switch turn
         board[y][x] = current_player;
         current_player = (current_player == Stone::Black ? Stone::White : Stone::Black);
         return true;
@@ -107,17 +111,11 @@ public:
     bool undo() {
         if (undoHistory.empty()) return false;
 
-        // Get last move
         Move lastMove = undoHistory.back();
         undoHistory.pop_back();
 
-        // Remove stone from board
         board[lastMove.y][lastMove.x] = Stone::Empty;
-
-        // Add to Redo stack
         redoHistory.push_back(lastMove);
-
-        // Switch turn back to the person who made that move
         current_player = lastMove.player;
         return true;
     }
@@ -125,17 +123,11 @@ public:
     bool redo() {
         if (redoHistory.empty()) return false;
 
-        // Get the move to redo
         Move nextMove = redoHistory.back();
         redoHistory.pop_back();
 
-        // Place stone back on board
         board[nextMove.y][nextMove.x] = nextMove.player;
-
-        // Add back to Undo stack
         undoHistory.push_back(nextMove);
-
-        // Switch turn to the next player
         current_player = (nextMove.player == Stone::Black ? Stone::White : Stone::Black);
         return true;
     }
@@ -153,10 +145,8 @@ public:
         std::ofstream outFile(filename);
         if (!outFile.is_open()) return false;
 
-        // Save current player (0 for Black, 1 for White usually, but we cast to int)
-        outFile << (current_player == Stone::Black ? 1 : 2) << "\n";
+        outFile << (current_player == Stone::Black ? 1 : 2) << "\n"; // Save current player
 
-        // Save Board
         for (const auto& row : board) {
             for (const auto& cell : row) {
                 int val = 0;
@@ -177,7 +167,6 @@ public:
         inFile >> playerVal;
         current_player = (playerVal == 1 ? Stone::Black : Stone::White);
 
-        // Clear history on load to prevent inconsistencies
         undoHistory.clear();
         redoHistory.clear();
 
@@ -194,10 +183,10 @@ public:
     }
 };
 
-// --- SFML UI Manager Class ---
+// --- In-Game UI Manager Class (Renamed and slightly adjusted constants) ---
 class GoUIManager {
 private:
-    sf::Font font;
+
     GoGame& game;
 
     sf::Text turnIndicator{};
@@ -211,10 +200,13 @@ private:
     };
 
 public:
+    sf::Font font;
+
     GoUIManager(GoGame& g) : game(g) {
         if (!font.loadFromFile("assets/fonts/arial.ttf")) {
-            std::cerr << "Error loading font." << std::endl;
-            std::exit(1);
+            std::cerr << "Error loading font for GoUIManager." << std::endl;
+            // Don't exit here, main menu might still work with default font or different assets
+            // std::exit(1);
         }
         initializeIndicators();
         initializeButtons();
@@ -224,22 +216,22 @@ public:
         turnIndicator.setFont(font);
         turnIndicator.setCharacterSize(24);
         turnIndicator.setFillColor(sf::Color::White);
-        turnIndicator.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X), static_cast<float>(BUTTON_START_Y - 40)));
+        turnIndicator.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(BUTTON_START_Y_GAME_UI - 40)));
 
         notificationText.setFont(font);
         notificationText.setCharacterSize(16);
         notificationText.setString("Ready to play.");
         notificationText.setFillColor(sf::Color::Yellow);
-        notificationText.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X), static_cast<float>(WINDOW_HEIGHT - 100)));
+        notificationText.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(WINDOW_HEIGHT - 100)));
     }
 
     void initializeButtons() {
-        int y_pos = BUTTON_START_Y + 40;
+        int y_pos = BUTTON_START_Y_GAME_UI + 40;
 
         for (const auto& label : buttonLabels) {
             sf::RectangleShape rect;
             rect.setSize(sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT));
-            rect.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X), static_cast<float>(y_pos)));
+            rect.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(y_pos)));
             rect.setFillColor(sf::Color(100, 100, 100));
             mainButtonRects.push_back(rect);
 
@@ -261,25 +253,23 @@ public:
         }
     }
 
-    // Helper to update UI text
     void setNotification(const std::string& msg) {
         notificationText.setString(msg);
     }
 
-    bool handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWindow& window) {
+    bool handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWindow& window, GameState& currentGameState) {
         for (size_t i = 0; i < mainButtonRects.size(); ++i) {
             if (mainButtonRects[i].getGlobalBounds().contains(
                     sf::Vector2f(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))))
             {
                 std::string label = buttonLabels[i];
 
-                // --- Button Logic ---
                 if (label == "EXIT GAME") {
-                    window.close();
+                    currentGameState = GameState::EXIT; // Signal main loop to exit
                 }
                 else if (label == "RESET GAME" || label == "START NEW GAME") {
                     game.resetGame();
-                    setNotification("Game Reset.");
+                    setNotification("New Game Started.");
                 }
                 else if (label == "UNDO MOVE") {
                     if (game.undo()) setNotification("Move Undone.");
@@ -297,10 +287,13 @@ public:
                     if (game.loadGame("savegame.txt")) setNotification("Game Loaded!");
                     else setNotification("Load Failed (No file?).");
                 }
+                else if (label == "SETTINGS") {
+                    currentGameState = GameState::SETTINGS;
+                    setNotification("Entering Settings.");
+                }
                 else {
                     setNotification("Feature not implemented.");
                 }
-
                 return true;
             }
         }
@@ -317,16 +310,15 @@ public:
         // Draw Indicator
         if (game.getCurrentPlayer() == Stone::Black) {
             turnIndicator.setString("Turn: BLACK");
-            turnIndicator.setFillColor(sf::Color::White); // Text is white
+            turnIndicator.setFillColor(sf::Color::White);
         } else {
             turnIndicator.setString("Turn: WHITE");
-            turnIndicator.setFillColor(sf::Color::Cyan); // Distinct color for white turn
+            turnIndicator.setFillColor(sf::Color::Cyan);
         }
         window.draw(turnIndicator);
 
         // Draw Buttons
         for (size_t i = 0; i < mainButtonRects.size(); ++i) {
-            // Highlight button on hover (optional logic could go here, keeping simple for now)
             window.draw(mainButtonRects[i]);
             window.draw(mainButtonTexts[i]);
         }
@@ -336,10 +328,132 @@ public:
     }
 };
 
-// --- Drawing Functions ---
+// --- Main Menu Screen Class ---
+class MainMenuScreen {
+private:
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
+    sf::Font titleFont;
+    sf::Font buttonFont;
+    sf::Text titleText;
+
+    std::vector<sf::RectangleShape> menuButtonRects;
+    std::vector<sf::Text> menuButtonTexts;
+    std::vector<std::string> buttonLabels = {
+        "NEW GAME", "LOAD GAME", "SETTINGS", "EXIT"
+    };
+
+public:
+    MainMenuScreen() {
+        // Load background image
+        if (!backgroundTexture.loadFromFile("assets/img/main_menu_bg.png")) {
+            std::cerr << "Error loading main menu background: assets/img/main_menu_bg.png" << std::endl;
+            // If background fails, try to continue without it.
+        } else {
+            backgroundSprite.setTexture(backgroundTexture);
+            // Scale background to window size, maintaining aspect ratio
+            float scaleX = static_cast<float>(WINDOW_WIDTH) / backgroundTexture.getSize().x;
+            float scaleY = static_cast<float>(WINDOW_HEIGHT) / backgroundTexture.getSize().y;
+            backgroundSprite.setScale(scaleX, scaleY);
+        }
+
+        // Load fonts
+        if (!titleFont.loadFromFile("assets/fonts/Minecrafter.ttf")) { // Custom font for title
+            std::cerr << "Error loading title font. Using Arial fallback." << std::endl;
+            if (!titleFont.loadFromFile("assets/fonts/arial.ttf")) { // Fallback
+                 std::cerr << "Error loading Arial fallback font. Main menu title may be missing." << std::endl;
+            }
+        }
+        if (!buttonFont.loadFromFile("assets/fonts/arial.ttf")) { // Arial for buttons
+            std::cerr << "Error loading button font. Buttons may be missing." << std::endl;
+        }
+
+        // Initialize Title
+        titleText.setFont(titleFont);
+        titleText.setString("GO GAME"); // Title of your game
+        titleText.setCharacterSize(72);
+        titleText.setFillColor(sf::Color::Black); // Example color
+        titleText.setOutlineColor(sf::Color::White);
+        titleText.setOutlineThickness(3.0f);
+
+        // Center the title text (assuming it's on the left, not literally centered on window)
+        sf::FloatRect titleBounds = titleText.getLocalBounds();
+        titleText.setOrigin(titleBounds.width / 2.0f, titleBounds.height / 2.0f);
+        titleText.setPosition(MENU_BUTTON_START_X + MENU_BUTTON_WIDTH / 2.0f, MENU_TITLE_Y + titleBounds.height / 2.0f);
+
+
+        // Initialize Buttons
+        int y_pos = MENU_BUTTON_START_Y;
+        for (const auto& label : buttonLabels) {
+            sf::RectangleShape rect;
+            rect.setSize(sf::Vector2f(MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT));
+            rect.setPosition(static_cast<float>(MENU_BUTTON_START_X), static_cast<float>(y_pos));
+            rect.setFillColor(sf::Color(100, 100, 100, 200)); // Semi-transparent grey
+            rect.setOutlineThickness(2.0f);
+            rect.setOutlineColor(sf::Color::White);
+            menuButtonRects.push_back(rect);
+
+            sf::Text text(label, buttonFont, 24);
+            text.setFillColor(sf::Color::White);
+
+            sf::FloatRect textBounds = text.getLocalBounds();
+            text.setOrigin(textBounds.width / 2.0f, textBounds.height / 2.0f);
+            text.setPosition(
+                rect.getPosition().x + rect.getSize().x / 2.0f,
+                rect.getPosition().y + rect.getSize().y / 2.0f
+            );
+            menuButtonTexts.push_back(text);
+            y_pos += MENU_BUTTON_HEIGHT + BUTTON_PADDING;
+        }
+    }
+
+    void draw(sf::RenderWindow& window) {
+        window.draw(backgroundSprite); // Draw background first
+        window.draw(titleText);
+
+        for (size_t i = 0; i < menuButtonRects.size(); ++i) {
+            window.draw(menuButtonRects[i]);
+            window.draw(menuButtonTexts[i]);
+        }
+    }
+
+    GameState handleEvent(const sf::Event& event, const sf::Vector2i& mousePos, GoGame& game) {
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            for (size_t i = 0; i < menuButtonRects.size(); ++i) {
+                if (menuButtonRects[i].getGlobalBounds().contains(
+                        static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                {
+                    std::string label = buttonLabels[i];
+                    if (label == "NEW GAME") {
+                        game.resetGame(); // Ensure game is fresh
+                        return GameState::PLAYING;
+                    } else if (label == "LOAD GAME") {
+                        if (game.loadGame("savegame.txt")) {
+                            std::cout << "Game loaded from savegame.txt" << std::endl; // For debugging
+                            // You might want a notification in the main game UI for this
+                            return GameState::PLAYING;
+                        } else {
+                            std::cerr << "Failed to load game." << std::endl;
+                            // Maybe add a temporary error message on the menu screen
+                            return GameState::MENU; // Stay on menu if load fails
+                        }
+                    } else if (label == "SETTINGS") {
+                        return GameState::SETTINGS;
+                    } else if (label == "EXIT") {
+                        return GameState::EXIT;
+                    }
+                }
+            }
+        }
+        return GameState::MENU; // Default to staying in menu
+    }
+};
+
+
+// --- Drawing Functions (Unchanged) ---
 
 void drawBoard(sf::RenderTarget& window) {
-    sf::RectangleShape fullBackground(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
+    sf::RectangleShape fullBackground(sf::Vector2f(BOARD_MAX_WIDTH, WINDOW_HEIGHT)); // Only cover board area
     fullBackground.setFillColor(sf::Color(60, 60, 60)); // Darker background for app
     window.draw(fullBackground);
 
@@ -374,14 +488,11 @@ void drawStones(sf::RenderTarget& window, const GoGame& game, const StoneTexture
             const sf::Texture& texture = textureManager.getTexture(s);
             stoneSprite.setTexture(texture);
 
-            // Scaling logic
             float scaleFactor = (STONE_RADIUS * 2.0f) / texture.getSize().x;
             stoneSprite.setScale(scaleFactor, scaleFactor);
 
-            // Center origin
             stoneSprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
 
-            // Position
             stoneSprite.setPosition(toScreenCoord(x, y));
 
             window.draw(stoneSprite);
@@ -389,14 +500,18 @@ void drawStones(sf::RenderTarget& window, const GoGame& game, const StoneTexture
     }
 }
 
-void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos) {
+void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& ui) {
     if (mousePos.x >= BOARD_MAX_WIDTH) return;
 
     int gx = std::round((mousePos.x - GRID_OFFSET) / CELL_SIZE);
     int gy = std::round((mousePos.y - GRID_OFFSET) / CELL_SIZE);
 
     if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
-        game.placeStone(gx, gy);
+        if (game.placeStone(gx, gy)) {
+            ui.setNotification("Stone placed at (" + std::to_string(gx) + "," + std::to_string(gy) + ")");
+        } else {
+            ui.setNotification("Invalid move.");
+        }
     }
 }
 
@@ -407,9 +522,11 @@ int main() {
     window.setFramerateLimit(60);
 
     GoGame game;
-    GoUIManager ui(game);
+    GoUIManager ui(game); // In-game UI
     StoneTextureManager textureManager;
+    MainMenuScreen mainMenu; // NEW: Main Menu
 
+    GameState currentGameState = GameState::MENU; // Start at the menu
     sf::Event event;
 
     while (window.isOpen()) {
@@ -418,23 +535,50 @@ int main() {
                 window.close();
             }
 
+            // Handle mouse clicks based on current game state
             if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
+                sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
 
+                if (currentGameState == GameState::MENU) {
+                    currentGameState = mainMenu.handleEvent(event, mousePos, game);
+                } else if (currentGameState == GameState::PLAYING) {
+                    // Check if click is on UI panel or board
                     if (mousePos.x >= BOARD_MAX_WIDTH) {
-                        ui.handleButtonClick(mousePos, window);
+                        ui.handleButtonClick(mousePos, window, currentGameState); // Pass game state to allow exit/settings
                     } else {
-                        handleBoardClick(game, mousePos);
+                        handleBoardClick(game, mousePos, ui);
                     }
+                } else if (currentGameState == GameState::SETTINGS) {
+                    // Placeholder: For now, clicking anywhere in settings takes you back to menu
+                    // In a real game, you'd have buttons for "Apply", "Back", etc.
+                    currentGameState = GameState::MENU;
                 }
             }
         }
 
+        // Handle game state transitions
+        if (currentGameState == GameState::EXIT) {
+            window.close();
+        }
+
         window.clear();
-        drawBoard(window);
-        drawStones(window, game, textureManager);
-        ui.draw(window);
+
+        // Draw based on current game state
+        if (currentGameState == GameState::MENU) {
+            mainMenu.draw(window);
+        } else if (currentGameState == GameState::PLAYING) {
+            drawBoard(window);
+            drawStones(window, game, textureManager);
+            ui.draw(window); // Draw in-game UI panel
+        } else if (currentGameState == GameState::SETTINGS) {
+            // Placeholder: Simple settings screen
+            sf::Text settingsText("SETTINGS SCREEN\n(Click to return to Main Menu)", ui.font, 30);
+            settingsText.setFillColor(sf::Color::White);
+            settingsText.setPosition(WINDOW_WIDTH / 2.0f - settingsText.getLocalBounds().width / 2.0f,
+                                     WINDOW_HEIGHT / 2.0f - settingsText.getLocalBounds().height / 2.0f);
+            window.draw(settingsText);
+        }
+
         window.display();
     }
 
