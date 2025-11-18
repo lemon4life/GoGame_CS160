@@ -89,7 +89,7 @@ public:
         : game(g) // This is now the only initializer list member
     {
         // FIX 1: Change openFromFile to loadFromFile for older SFML
-        if (!font.loadFromFile("arial.ttf")) {
+        if (!font.loadFromFile("assets/fonts/arial.ttf")) {
             std::cerr << "Error loading font. Make sure 'arial.ttf' is in the executable directory." << std::endl;
             std::exit(1);
         }
