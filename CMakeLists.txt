@@ -15,7 +15,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SFML)
 
-add_executable(hnanh_gogame_local UI.cpp)
+add_executable(hnanh_gogame_local src/UI.cpp)
+#add_executable(hnanh_gogame_local src/board.cpp)
+
 
 # Link SFML headers (no longer need the SYSTEM workaround as 2.x is standard)
 target_include_directories(hnanh_gogame_local
