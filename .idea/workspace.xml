@@ -24,23 +24,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/include/AudioManager.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/GoGame.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/GoUIManager.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/MainMenuScreen.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/SettingsScreen.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/TextureManager.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -136,7 +123,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1763461129119</updated>
-      <workItem from="1763461130745" duration="8610000" />
+      <workItem from="1763461130745" duration="10020000" />
     </task>
     <servers />
   </component>

@@ -39,7 +39,13 @@ int main() {
     GameState currentGameState = GameState::MENU;
     sf::Event event;
 
+    sf::Font mainFont;
+    if (!mainFont.loadFromFile("assets/fonts/arial.ttf")) {
+        // handle error
+    }
+
     while (window.isOpen()) {
+
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
 
@@ -71,7 +77,9 @@ int main() {
             settingsScreen.draw(window);
         }
         else if (currentGameState == GameState::PLAYING) {
-            GameRenderer::drawBoard(window, settings);
+            // UPDATE THIS LINE: Pass 'mainFont'
+            GameRenderer::drawBoard(window, settings, mainFont);
+
             GameRenderer::drawStones(window, game, textureManager, settings);
             ui.draw(window);
         }
