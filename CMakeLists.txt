@@ -19,7 +19,23 @@ find_package(SFML 2.6.1 REQUIRED COMPONENTS system window graphics audio)
 # We list ALL .cpp files from the src/ folder
 add_executable(GoGame_CS160
         src/Board.cpp
-        src/UI.cpp
+        #src/UI.cpp
+        src/main.cpp
+        include/Definitions.h
+        include/TextureManager.h
+        src/TextureManager.cpp
+        include/GoGame.h
+        src/GoGame.cpp
+        include/GameRenderer.h
+        src/GameRenderer.cpp
+        include/AudioManager.h
+        src/AudioManager.cpp
+        include/GoUIManager.h
+        src/GoUIManager.cpp
+        include/MainMenuScreen.h
+        src/MainMenuScreen.cpp
+        include/SettingsScreen.h
+        src/SettingsScreen.cpp
         # Add any other .cpp files you create here
 )
 

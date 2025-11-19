@@ -1,0 +1,44 @@
+// include/Definitions.h
+#pragma once
+#include <SFML/Graphics.hpp>
+
+// --- Constants ---
+const int BOARD_SIZE = 19;
+const int WINDOW_WIDTH = 1000;
+const int WINDOW_HEIGHT = 850;
+const int GRID_OFFSET = 50;
+const float STONE_RADIUS = 20.0f;
+const int PANEL_WIDTH = 200;
+const float BOARD_MAX_WIDTH = WINDOW_WIDTH - PANEL_WIDTH;
+const float CELL_SIZE = (WINDOW_HEIGHT - 2 * GRID_OFFSET) / (BOARD_SIZE - 1.0f);
+
+// UI Constants
+const int BUTTON_HEIGHT = 40;
+const int BUTTON_PADDING = 10;
+const int BUTTON_START_X_GAME_UI = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING;
+const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
+
+// Enums
+enum class Stone { Empty, Black, White };
+enum class GameState { MENU, PLAYING, SETTINGS, EXIT };
+
+// Structs
+struct Move {
+    int x;
+    int y;
+    Stone player;
+};
+
+struct GameSettings {
+    int boardThemeIndex = 0; // 0:Wood, 1:Blue, 2:Dark
+    int stoneStyleIndex = 0; // 0:Classic, 1:Modern, 2:Cartoon
+    bool soundEnabled = true;
+    bool musicEnabled = true;
+    float volume = 50.0f;
+
+    sf::Color getBoardColor() const {
+        if (boardThemeIndex == 1) return sf::Color(100, 149, 237);
+        if (boardThemeIndex == 2) return sf::Color(40, 40, 40);
+        return sf::Color(222, 184, 135);
+    }
+};
