@@ -20,8 +20,9 @@ const int BUTTON_START_X_GAME_UI = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING;
 const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
 
 // Enums
+
 enum class Stone { Empty, Black, White };
-enum class GameState { MENU, PLAYING, SETTINGS, EXIT };
+enum class GameState { MENU, PLAYING, SETTINGS, EXIT, SAVE_MENU, LOAD_MENU };
 
 // Structs
 struct Move {
