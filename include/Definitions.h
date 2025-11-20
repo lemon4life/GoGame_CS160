@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 // --- Constants ---
+const int STONESNUM = 3;
 const int BOARD_SIZE = 19;
 const int WINDOW_WIDTH = 1050;
 const int WINDOW_HEIGHT = 850;
@@ -36,9 +37,10 @@ struct GameSettings {
     bool musicEnabled = true;
     float volume = 50.0f;
 
-    sf::Color getBoardColor() const {
-        if (boardThemeIndex == 1) return sf::Color(100, 149, 237);
-        if (boardThemeIndex == 2) return sf::Color(40, 40, 40);
-        return sf::Color(222, 184, 135);
+    std::string getBoardImagePath() const {
+        // Make sure these files exist in your assets folder!
+        if (boardThemeIndex == 1) return "assets/img/background/ocean.jpg";
+        if (boardThemeIndex == 2) return "assets/img/background/galaxy.jpg";
+        return "assets/img/background/wood.jpg"; // Default (Index 0)
     }
 };

@@ -75,9 +75,10 @@ void SettingsScreen::updateTexts() {
         
         if (btn.id == 0) { // Board Theme
             if (settings.boardThemeIndex == 0) suffix = "Wood";
-            else if (settings.boardThemeIndex == 1) suffix = "Blue";
-            else suffix = "Dark";
-        } 
+            else if (settings.boardThemeIndex == 1) suffix = "Ocean";
+            else suffix = "Galaxy";
+        }
+
         else if (btn.id == 1) suffix = textureMgr.getStyleName(settings.stoneStyleIndex);
         else if (btn.id == 2) suffix = settings.soundEnabled ? "ON" : "OFF";
         else if (btn.id == 3) suffix = settings.musicEnabled ? "ON" : "OFF";
@@ -130,7 +131,7 @@ GameState SettingsScreen::handleClick(const sf::Vector2i& mousePos) {
         if (btn.rect.getGlobalBounds().contains(pos)) {
             // Toggle Logic
             if (btn.id == 0) settings.boardThemeIndex = (settings.boardThemeIndex + 1) % 3;
-            else if (btn.id == 1) settings.stoneStyleIndex = (settings.stoneStyleIndex + 1) % 3;
+            else if (btn.id == 1) settings.stoneStyleIndex = (settings.stoneStyleIndex + 1) % STONESNUM;
             else if (btn.id == 2) settings.soundEnabled = !settings.soundEnabled;
             else if (btn.id == 3) {
                 settings.musicEnabled = !settings.musicEnabled;

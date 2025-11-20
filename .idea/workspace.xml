@@ -29,17 +29,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/img/main_menu_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/img/main_menu_bg.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/img/blackstone.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/img/whitestone.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Game.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UI.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TextureManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -138,7 +135,7 @@
       <updated>1763461129119</updated>
       <workItem from="1763461130745" duration="10373000" />
       <workItem from="1763512751477" duration="74000" />
-      <workItem from="1763528343004" duration="9416000" />
+      <workItem from="1763528343004" duration="14404000" />
     </task>
     <servers />
   </component>

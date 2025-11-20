@@ -40,7 +40,12 @@ int main() {
     sf::Event event;
 
     sf::Font mainFont;
+    sf::Font boldFont;
     if (!mainFont.loadFromFile("assets/fonts/arial.ttf")) {
+        //handle error
+    }
+
+    if (!boldFont.loadFromFile("assets/fonts/arialbd.ttf")) {
         //handle error
     }
 
@@ -78,7 +83,7 @@ int main() {
         }
         else if (currentGameState == GameState::PLAYING) {
             // UPDATE THIS LINE: Pass 'mainFont'
-            GameRenderer::drawBoard(window, settings, mainFont);
+            GameRenderer::drawBoard(window, settings, boldFont);
 
             GameRenderer::drawStones(window, game, textureManager, settings);
             ui.draw(window);

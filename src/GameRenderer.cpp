@@ -7,98 +7,144 @@ sf::Vector2f GameRenderer::toScreenCoord(int x, int y) {
     return sf::Vector2f(GRID_OFFSET + x * CELL_SIZE, GRID_OFFSET + y * CELL_SIZE);
 }
 
-void GameRenderer::drawBoard(sf::RenderTarget& window, const GameSettings& settings, const sf::Font& font) {
-    // 1. Draw Background
-    sf::RectangleShape fullBackground(sf::Vector2f(BOARD_MAX_WIDTH, WINDOW_HEIGHT));
-    fullBackground.setFillColor(sf::Color(60, 60, 60));
-    window.draw(fullBackground);
+#include "GameRenderer.h"
+#include <iostream> // For error logging
 
-    sf::RectangleShape boardBackground(sf::Vector2f(BOARD_MAX_WIDTH, WINDOW_HEIGHT));
-    boardBackground.setFillColor(settings.getBoardColor());
-    window.draw(boardBackground);
+namespace GameRenderer {
 
-    // 2. Draw Grid Lines (1 to 19)
-    const sf::Color lineColor(0, 0, 0);
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        // Vertical line
-        sf::Vertex line1[] = {
-            sf::Vertex(toScreenCoord(i, 0), lineColor),
-            sf::Vertex(toScreenCoord(i, BOARD_SIZE - 1), lineColor)
-        };
-        window.draw(line1, 2, sf::PrimitiveType::Lines);
+    // ... (Keep your toScreenCoord function here) ...
 
-        // Horizontal line
-        sf::Vertex line2[] = {
-            sf::Vertex(toScreenCoord(0, i), lineColor),
-            sf::Vertex(toScreenCoord(BOARD_SIZE - 1, i), lineColor)
-        };
-        window.draw(line2, 2, sf::PrimitiveType::Lines);
+    void drawBoard(sf::RenderTarget& window, const GameSettings& settings, const sf::Font& font) {
 
-        // --- 3. Draw Coordinates (Labels) ---
+        // --- 1. Texture Caching Logic (The "Namespace" Fix) ---
+        // 'static' means these variables persist between function calls!
+        static sf::Texture boardTexture;
+        static int lastThemeIndex = -1;
 
-        // ---------------------------------------------------------
-        // NUMBERS (Rows)
-        // ---------------------------------------------------------
-        std::string numStr = std::to_string(BOARD_SIZE - i);
-        sf::Text numText(numStr, font, 14);
-        numText.setFillColor(sf::Color::Black);
-        sf::FloatRect nb = numText.getLocalBounds();
+        // Only load the image if the theme changed (or on first run)
+        if (lastThemeIndex != settings.boardThemeIndex) {
+            std::string path = settings.getBoardImagePath();
+            if (boardTexture.loadFromFile(path)) {
+                boardTexture.setSmooth(true);
+                lastThemeIndex = settings.boardThemeIndex;
+                std::cout << "[GameRenderer] Loaded board texture: " << path << std::endl;
+            } else {
+                std::cerr << "[GameRenderer] Failed to load texture: " << path << std::endl;
+            }
+        }
 
-        // 1. Draw Numbers on the Left
-        numText.setOrigin(nb.width, nb.height / 2.0f); // Align right-center
-        numText.setPosition(toScreenCoord(0, i).x - 15, toScreenCoord(0, i).y);
-        window.draw(numText);
+        // --- 2. Draw Background ---
 
-        // 2. Draw Numbers on the Right (NEW)
-        sf::Text rightNumText = numText; // Copy style
-        // Set origin to left-center so it draws outwards to the right
-        rightNumText.setOrigin(0, nb.height / 2.0f);
-        // Position at the X of the last column + offset
-        rightNumText.setPosition(toScreenCoord(BOARD_SIZE - 1, i).x + 15, toScreenCoord(BOARD_SIZE - 1, i).y);
-        window.draw(rightNumText);
+        // Dark grey background for the whole window
+        sf::RectangleShape fullBackground(sf::Vector2f(BOARD_MAX_WIDTH, WINDOW_HEIGHT));
+        fullBackground.setFillColor(sf::Color(60, 60, 60));
+        window.draw(fullBackground);
 
-        // ---------------------------------------------------------
-        // LETTERS (Columns)
-        // ---------------------------------------------------------
-        char letterChar = 'A' + i;
-        // Optional: Standard Go boards usually skip 'I' to avoid confusion with '1'.
-        // If you want that behavior, uncomment the line below:
-        // if (letterChar >= 'I') letterChar++;
+        // The Board Area with Texture
+        sf::RectangleShape boardBackground(sf::Vector2f(BOARD_MAX_WIDTH, WINDOW_HEIGHT));
+        boardBackground.setTexture(&boardTexture); // Apply the static texture
+        boardBackground.setFillColor(sf::Color::White); // White so it doesn't tint the image
+        window.draw(boardBackground);
 
-        sf::Text charText(std::string(1, letterChar), font, 14);
-        charText.setFillColor(sf::Color::Black);
-        sf::FloatRect cb = charText.getLocalBounds();
+        // --- 3. Determine Line/Text Colors ---
+        // If theme is Dark (index 2), use White lines. Otherwise, use Black.
+        sf::Color lineColor = (settings.boardThemeIndex == 2) ? sf::Color(220, 220, 220) : sf::Color::Black;
+        sf::Color textColor = (settings.boardThemeIndex == 2) ? sf::Color(220, 220, 220) : sf::Color::Black;
 
-        // 3. Draw Letters on the Top
-        charText.setOrigin(cb.width / 2.0f, cb.height); // Align bottom-center
-        charText.setPosition(toScreenCoord(i, 0).x, toScreenCoord(i, 0).y - 15);
-        window.draw(charText);
+        float lineThickness = 2.0f;
 
-        // 4. Draw Letters on the Bottom (NEW)
-        sf::Text botCharText = charText; // Copy style
-        // Set origin to top-center so it draws downwards
-        botCharText.setOrigin(cb.width / 2.0f, 0);
-        // Position at the Y of the last row + offset
-        botCharText.setPosition(toScreenCoord(i, BOARD_SIZE - 1).x, toScreenCoord(i, BOARD_SIZE - 1).y + 15);
-        window.draw(botCharText);
-    }
+        // --- 4. Draw Grid Lines ---
+        for (int i = 0; i < BOARD_SIZE; ++i) {
+            // ----------------------------------------
+            // Vertical Line
+            // ----------------------------------------
+            sf::Vector2f vStart = toScreenCoord(i, 0);
+            sf::Vector2f vEnd   = toScreenCoord(i, BOARD_SIZE - 1);
 
-    // --- 4. Draw Star Points (Hoshi) ---
-    // On a 19x19 board, star points are at indices 3, 9, and 15 (0-based)
-    // i.e. (4,4), (4,10), (4,16)...
-    std::vector<int> starIndices = {3, 9, 15};
+            // Calculate height based on coordinates
+            float height = vEnd.y - vStart.y;
 
-    for (int y : starIndices) {
-        for (int x : starIndices) {
-            sf::CircleShape starPoint(4.0f); // Small dot
-            starPoint.setFillColor(sf::Color::Black);
-            starPoint.setOrigin(4.0f, 4.0f); // Center it
-            starPoint.setPosition(toScreenCoord(x, y));
-            window.draw(starPoint);
+            sf::RectangleShape verticalLine(sf::Vector2f(lineThickness, height));
+            verticalLine.setFillColor(lineColor);
+            verticalLine.setPosition(vStart);
+
+            // Center the thickness so the line sits exactly on the grid coordinate
+            // Origin (thickness/2, 0) shifts the drawing slightly left
+            verticalLine.setOrigin(lineThickness / 2.0f, 0.0f);
+
+            window.draw(verticalLine);
+
+            // ----------------------------------------
+            // Horizontal Line
+            // ----------------------------------------
+            sf::Vector2f hStart = toScreenCoord(0, i);
+            sf::Vector2f hEnd   = toScreenCoord(BOARD_SIZE - 1, i);
+
+            // Calculate width based on coordinates
+            float width = hEnd.x - hStart.x;
+
+            sf::RectangleShape horizontalLine(sf::Vector2f(width, lineThickness));
+            horizontalLine.setFillColor(lineColor);
+            horizontalLine.setPosition(hStart);
+
+            // Center the thickness vertically
+            // Origin (0, thickness/2) shifts the drawing slightly up
+            horizontalLine.setOrigin(0.0f, lineThickness / 2.0f);
+
+            window.draw(horizontalLine);
+
+            // --- 5. Draw Coordinates (Labels) ---
+
+            // ---------------- Numbers (Rows) ----------------
+            std::string numStr = std::to_string(BOARD_SIZE - i);
+            sf::Text numText(numStr, font, 20);
+            numText.setFillColor(textColor);
+            sf::FloatRect nb = numText.getLocalBounds();
+
+            // Left Side
+            numText.setOrigin(nb.width, nb.height / 2.0f);
+            numText.setPosition(toScreenCoord(0, i).x - 25, toScreenCoord(0, i).y);
+            window.draw(numText);
+
+            // Right Side
+            sf::Text rightNumText = numText;
+            rightNumText.setOrigin(0, nb.height / 2.0f);
+            rightNumText.setPosition(toScreenCoord(BOARD_SIZE - 1, i).x + 25, toScreenCoord(BOARD_SIZE - 1, i).y);
+            window.draw(rightNumText);
+
+            // ---------------- Letters (Columns) ----------------
+            char letterChar = 'A' + i;
+            // if (letterChar >= 'I') letterChar++; // Uncomment for standard Go skipping 'I'
+
+            sf::Text charText(std::string(1, letterChar), font, 20);
+            charText.setFillColor(textColor);
+            sf::FloatRect cb = charText.getLocalBounds();
+
+            // Top Side
+            charText.setOrigin(cb.width / 2.0f, cb.height);
+            charText.setPosition(toScreenCoord(i, 0).x, toScreenCoord(i, 0).y - 30);
+            window.draw(charText);
+
+            // Bottom Side
+            sf::Text botCharText = charText;
+            botCharText.setOrigin(cb.width / 2.0f, 0);
+            botCharText.setPosition(toScreenCoord(i, BOARD_SIZE - 1).x, toScreenCoord(i, BOARD_SIZE - 1).y + 25);
+            window.draw(botCharText);
+        }
+
+        // --- 6. Draw Star Points (Hoshi) ---
+        std::vector<int> starIndices = {3, 9, 15};
+        for (int y : starIndices) {
+            for (int x : starIndices) {
+                sf::CircleShape starPoint(6.0f);
+                starPoint.setFillColor(lineColor);
+                starPoint.setOrigin(6.0f, 6.0f);
+                starPoint.setPosition(toScreenCoord(x, y));
+                window.draw(starPoint);
+            }
         }
     }
 }
-
 void GameRenderer::drawStones(sf::RenderTarget& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
     sf::Sprite stoneSprite;
 
