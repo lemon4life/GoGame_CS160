@@ -29,15 +29,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/img/blackstone.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/img/whitestone.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TextureManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/header/board.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/header/temp_board.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/board.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +59,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectApplicationVersion">
@@ -80,36 +77,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;CMake Application.GoGame.executor&quot;: &quot;Run&quot;,
-    &quot;CMake Application.GoGame_CS160.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "CMake Application.GoGame.executor": "Run",
+    "CMake Application.GoGame_CS160.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "Merging main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CMakeSettings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\include" />
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\src" />
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160" />
     </key>
@@ -135,7 +133,7 @@
       <updated>1763461129119</updated>
       <workItem from="1763461130745" duration="10373000" />
       <workItem from="1763512751477" duration="74000" />
-      <workItem from="1763528343004" duration="14404000" />
+      <workItem from="1763528343004" duration="14727000" />
     </task>
     <servers />
   </component>
