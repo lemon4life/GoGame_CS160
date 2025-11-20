@@ -122,7 +122,7 @@ int GoEngine::convert_numeral(Player a){
 }
 void GoEngine::switchPlayer(){
     if(currentPlayer == Player::BLACK) currentPlayer = Player::WHITE;
-    if(currentPlayer == Player::WHITE) currentPlayer = Player::BLACK;
+    else if(currentPlayer == Player::WHITE) currentPlayer = Player::BLACK;
 }
 
 
@@ -154,11 +154,14 @@ bool GoEngine::make_move(int x, int y){
     switchPlayer();
     if(board[x][y] != Player::NONE) {
         cur_move--;
+        switchPlayer();
         return false;
     }
     board[x][y] = currentPlayer;
     if(!reassest_board_state(x, y)){
-        undo_step();
+        cur_move--;
+        switchPlayer();
+        board = history.board[cur_move];
         //cout << "Move: " << cur_move << endl;
         //cout << "Again!" << endl;
         return false;
