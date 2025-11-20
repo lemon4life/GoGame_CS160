@@ -1,4 +1,4 @@
-#include "../../include/board.h"
+#include "../../include/Board.h"
 
 using namespace std;
 //--------PRIVATE FUNCTION DEFINITIONS----------

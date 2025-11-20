@@ -29,7 +29,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/board.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Board.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainMenuScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/header/temp_board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/header/temp_board.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +136,7 @@
       <updated>1763461129119</updated>
       <workItem from="1763461130745" duration="10373000" />
       <workItem from="1763512751477" duration="74000" />
-      <workItem from="1763528343004" duration="15043000" />
+      <workItem from="1763528343004" duration="19721000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
@@ -159,10 +163,6 @@
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/AudioManager.cpp</url>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/GoGame.cpp</url>
-          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

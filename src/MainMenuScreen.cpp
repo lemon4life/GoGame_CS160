@@ -15,7 +15,7 @@ MainMenuScreen::MainMenuScreen() {
     }
 
     // Load Fonts
-    if (!titleFont.loadFromFile("assets/fonts/Minecrafter.ttf")) {
+    if (!titleFont.loadFromFile("assets/fonts/impact.ttf")) {
         if (!titleFont.loadFromFile("assets/fonts/arial.ttf")) {
             std::cerr << "[MainMenu] Error: Could not load any title font." << std::endl;
         }

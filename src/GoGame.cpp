@@ -1,5 +1,6 @@
 #include "GoGame.h"
-#include <fstream> // Required for file saving/loading
+#include "Board.h"
+#include <fstream>
 
 // Constructor
 GoGame::GoGame(AudioManager& am) : current_player(Stone::Black), audio(am) {
