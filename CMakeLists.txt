@@ -36,7 +36,10 @@ add_executable(GoGame_CS160
         src/MainMenuScreen.cpp
         include/SettingsScreen.h
         src/SettingsScreen.cpp
-        src/header/temp_board.cpp
+        include/Board.h
+        src/Board.cpp
+        include/SaveLoadScreen.h
+        src/SaveLoadScreen.cpp
         # Add any other .cpp files you create here
 )
 

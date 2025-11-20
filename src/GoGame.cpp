@@ -1,137 +1,87 @@
 #include "GoGame.h"
-#include "Board.h"
-#include <fstream>
+#include <iostream>
+
+// --- Helper to convert Engine Enum to UI Enum ---
+Stone playerToStone(Player p) {
+    if (p == Player::BLACK) return Stone::Black;
+    if (p == Player::WHITE) return Stone::White;
+    return Stone::Empty;
+}
 
 // Constructor
-GoGame::GoGame(AudioManager& am) : current_player(Stone::Black), audio(am) {
-    board.resize(BOARD_SIZE, std::vector<Stone>(BOARD_SIZE, Stone::Empty));
+GoGame::GoGame(AudioManager& am) : audio(am) {
+    // Initialize the engine (19x19)
+    engine.initialize_board(BOARD_SIZE);
 }
 
 // Get Current Player
 Stone GoGame::getCurrentPlayer() const {
-    return current_player;
+    return playerToStone(engine.getCurrentPlayer());
 }
 
-// Get Stone at Position
+// Get Stone at Position (UI Coordinates 0-18)
 Stone GoGame::getStoneAt(int x, int y) const {
+    // Engine uses 1-based indexing (1-19), UI uses 0-based (0-18)
+    // We need to map UI(x,y) -> Engine(x+1, y+1)
+
+    // Get the raw board from engine
+    // Note: Engine board is vector<vector<Player>>
+    const auto& engineBoard = engine.getBoard();
+
+    // Safety check for bounds
     if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE)
         return Stone::Empty;
-    return board[y][x];
+
+    // Map 0-based to 1-based
+    Player p = engineBoard[x + 1][y + 1];
+    return playerToStone(p);
 }
 
-// Place Stone
+// Place Stone (UI Coordinates 0-18)
 bool GoGame::placeStone(int x, int y) {
-    // 1. Check validity
-    if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE || board[y][x] != Stone::Empty)
-        return false;
+    // 1. Convert to Engine Coordinates (1-based)
+    int engineX = x + 1;
+    int engineY = y + 1;
 
-    // 2. Record the move for Undo
-    Move move = {x, y, current_player};
-    undoHistory.push_back(move);
+    // 2. Ask Engine to make the move
+    // make_move returns true if successful, false if invalid (occupied, suicide, ko)
+    bool success = engine.make_move(engineX, engineY);
 
-    // 3. Clear Redo history (cannot redo after making a new move)
-    redoHistory.clear();
+    // 3. If successful, play sound and return true
+    if (success) {
+        audio.playPlaceStone();
+        return true;
+    }
 
-    // 4. Place stone and switch turn
-    board[y][x] = current_player;
-    current_player = (current_player == Stone::Black ? Stone::White : Stone::Black);
-
-    // 5. Play Sound
-    audio.playPlaceStone();
-
-    return true;
+    return false;
 }
 
 // Undo Move
 bool GoGame::undo() {
-    if (undoHistory.empty()) return false;
-
-    // Get last move
-    Move lastMove = undoHistory.back();
-    undoHistory.pop_back();
-
-    // Remove stone from board
-    board[lastMove.y][lastMove.x] = Stone::Empty;
-
-    // Add to Redo stack
-    redoHistory.push_back(lastMove);
-
-    // Switch turn back to the person who made that move
-    current_player = lastMove.player;
+    // You might want to add a check in Engine if undo is possible (history not empty)
+    engine.undo_step();
     return true;
 }
 
 // Redo Move
 bool GoGame::redo() {
-    if (redoHistory.empty()) return false;
-
-    // Get the move to redo
-    Move nextMove = redoHistory.back();
-    redoHistory.pop_back();
-
-    // Place stone back on board
-    board[nextMove.y][nextMove.x] = nextMove.player;
-
-    // Add back to Undo stack
-    undoHistory.push_back(nextMove);
-
-    // Switch turn to the next player
-    current_player = (nextMove.player == Stone::Black ? Stone::White : Stone::Black);
+    engine.redo_step();
     return true;
 }
 
 // Reset Game
 void GoGame::resetGame() {
-    for (auto& row : board) {
-        std::fill(row.begin(), row.end(), Stone::Empty);
-    }
-    current_player = Stone::Black;
-    undoHistory.clear();
-    redoHistory.clear();
+    engine.initialize_board(BOARD_SIZE);
 }
 
 // Save Game
 bool GoGame::saveGame(const std::string& filename) {
-    std::ofstream outFile(filename);
-    if (!outFile.is_open()) return false;
-
-    // Save current player
-    outFile << (current_player == Stone::Black ? 1 : 2) << "\n";
-
-    // Save Board
-    for (const auto& row : board) {
-        for (const auto& cell : row) {
-            int val = 0;
-            if (cell == Stone::Black) val = 1;
-            if (cell == Stone::White) val = 2;
-            outFile << val << " ";
-        }
-        outFile << "\n";
-    }
-    return true;
+    // Delegate directly to engine
+    return engine.saveGame(filename);
 }
 
 // Load Game
 bool GoGame::loadGame(const std::string& filename) {
-    std::ifstream inFile(filename);
-    if (!inFile.is_open()) return false;
-
-    int playerVal;
-    inFile >> playerVal;
-    current_player = (playerVal == 1 ? Stone::Black : Stone::White);
-
-    // Clear history on load to prevent inconsistencies
-    undoHistory.clear();
-    redoHistory.clear();
-
-    for (int y = 0; y < BOARD_SIZE; ++y) {
-        for (int x = 0; x < BOARD_SIZE; ++x) {
-            int val;
-            inFile >> val;
-            if (val == 1) board[y][x] = Stone::Black;
-            else if (val == 2) board[y][x] = Stone::White;
-            else board[y][x] = Stone::Empty;
-        }
-    }
-    return true;
+    // Delegate directly to engine
+    return engine.loadGame(filename);
 }
