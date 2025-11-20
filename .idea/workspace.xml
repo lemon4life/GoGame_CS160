@@ -29,10 +29,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/header/board.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/header/temp_board.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/board.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +56,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160/src/header/board.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -93,7 +92,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160",
     "node.js.detected.package.eslint": "true",
@@ -133,8 +132,17 @@
       <updated>1763461129119</updated>
       <workItem from="1763461130745" duration="10373000" />
       <workItem from="1763512751477" duration="74000" />
-      <workItem from="1763528343004" duration="14727000" />
+      <workItem from="1763528343004" duration="15043000" />
     </task>
+    <task id="LOCAL-00001">
+      <option name="closed" value="true" />
+      <created>1763617724718</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763617724718</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
