@@ -1,6 +1,115 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+class Calculate_Point{
+    public:
+
+    vector< vector<bool> > Bouzy(int sz, vector< vector<int> >& brd){
+        vector< vector<int> > influence(sz+1, vector<int>(sz+1, 0));
+        for(int i = 1; i <= sz; i++){
+            for(int j = 1; j <= sz; j++){
+                if(brd[i][j] == 2) influence[i][j] = 128;
+                if(brd[i][j] == 1) influence[i][j] = -128;
+            }
+        }
+
+        for(int t = 0; t < 5; t++){
+            vector<vector<int> > new_map = influence;
+            for(int i = 1; i <= sz; i++){
+                for(int j = 1; j <= sz; j++){
+                    int Binf = 0, Winf = 0;
+                    for(int k = 0; k < 4; k++){
+                        int xn = i + switch_row[i], yn = j + switch_col[i];
+                        if(xn > 0 && yn > 0 && xn <= sz && yn <= sz){
+                            if(influence[xn][yn] > 0) Binf++;
+                            else if(influence[xn][yn] < 0) Winf++;
+                        }
+                    }
+                    if(Binf == 0) new_map[i][j] -= Winf;
+                    if(Winf == 0) new_map[i][j] += Binf;
+                }
+            }
+            influence = new_map;
+        }
+
+        for(int t = 0; t < 21; t++){
+            vector< vector<int> > new_map = influence;
+            for(int i = 1; i <= sz; i++){
+                for(int j = 1; j <= sz; j++){
+                    for(int k = 0; k < 4; k++){
+                        int xn = i + switch_row[i], yn = j + switch_col[i];
+                        if(xn > 0 && yn > 0 && xn <= sz && yn <= sz){
+                            if(influence[i][j] > 0 && influence[xn][yn] <= 0) new_map[i][j]--;
+                            if(influence[i][j] < 0 && influence[xn][yn] >= 0) new_map[i][j]++;
+                        }
+                    }
+                }
+            }
+            influence = new_map;
+        }
+
+        vector< vector<bool> > dead(sz+1, vector<bool>(sz+1, 0));
+        for(int i = 1; i <= sz; i++){
+            for(int j = 1; j <= sz; j++) if((brd[i][j] == 2 && influence[i][j] >= 0) || (brd[i][j] == 1 && influence[i][j] <= 0)) dead[i][j] = 1;
+        }
+        return dead;
+
+    }
+
+    void toggle_life_death(vector< vector<bool>>& brd, int x, int y){
+        brd[x][y] = brd[x][y] ^ 1;
+    }
+
+    pair<int, int> result(int sz, int komi, vector< vector<int> >& brd, vector< vector<bool> >& dead){
+        clean_up_dead(sz, brd, dead);
+        vector< vector<bool> > checked(sz+1, vector<bool>(sz+1, 0));
+        int Bpt = 0, Wpt = komi;
+        for(int i = 1; i <= sz; i++){
+            for(int j = 1; j <= sz; j++) if(checked[i][j] = 0){
+                int cnt = 0; bool Badj = 0, Wadj = 0;
+                queue<pair<int, int>> q;
+                q.push({i, j});
+
+                while(!q.empty()){
+                    auto [x, y] = q.front();
+                    q.pop();
+                    checked[x][y] = 1;
+                    cnt++;
+
+                    for(int i = 0; i < 4; i++){
+                        int xn = x + switch_row[i], yn = y + switch_col[i];
+                        if(xn > 0 && yn > 0 && xn <= sz && yn <= sz && !checked[xn][yn]){
+                            if(brd[xn][yn] == 2) Badj = 1;
+                            if(brd[xn][yn] == 1) Wadj = 1;
+                            if(brd[xn][yn] == brd[i][j]) q.push({xn, yn});
+                        }
+                    }
+                }
+
+                if(brd[i][j] == 2) Bpt += cnt;
+                if(brd[i][j] == 1) Wpt += cnt;
+                if(brd[i][j] == 0){
+                    if(Badj == 0 && Wadj == 0) continue;
+                    if(!Wadj) Bpt += cnt;
+                    if(!Badj) Wpt += cnt; 
+                }
+            }
+        }
+        return {Bpt, Wpt};
+    }
+    private:
+    int switch_row[4] = {-1, 1, 0, 0}, switch_col[4] = {0, 0, -1, 1};
+
+    void clean_up_dead(int sz, vector< vector<int> >& brd, vector< vector<bool> > dead){
+        for(int i = 1; i <= sz; i++)
+            for(int j = 1; j <= sz; j++) if(dead[i][j] == 1) brd[i][j] = 0;
+    }
+};
+
+class Save_and_Load{
+
+};
+
 class Board {
     public:
         vector< vector<int> > board;
