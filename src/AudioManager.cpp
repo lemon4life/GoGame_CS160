@@ -4,19 +4,22 @@
 AudioManager::AudioManager(GameSettings& s) : settings(s) {
     // 1. Load Sound Effects
     // These files must exist in cmake-build-debug/assets/audio/
-    if (!placeBuffer.loadFromFile("assets/audio/click.wav")) {
-        std::cerr << "[AudioManager] Error: Could not load assets/audio/click.wav" << std::endl;
+    if (!placeBuffer.loadFromFile("assets/audio/click.mp3")) {
+        std::cerr << "[AudioManager] Error: Could not load assets/audio/click.mp3" << std::endl;
     }
 
-    if (!captureBuffer.loadFromFile("assets/audio/capture.wav")) {
-        std::cerr << "[AudioManager] Error: Could not load assets/audio/capture.wav" << std::endl;
+    if (!captureBuffer.loadFromFile("assets/audio/capture.mp3")) {
+        std::cerr << "[AudioManager] Error: Could not load assets/audio/capture.mp3" << std::endl;
     }
 
     // 2. Load Background Music
     // OpenFromFile streams it, so it doesn't use much RAM
-    if (!bgMusic.openFromFile("assets/audio/bgm.ogg")) {
-        std::cerr << "[AudioManager] Error: Could not load assets/audio/bgm.ogg" << std::endl;
+    if (!bgMusic.openFromFile("assets/audio/bgm.mp3")) {
+        std::cerr << "[AudioManager] Error: Could not load assets/audio/bgm.mp3" << std::endl;
     } else {
+        if (bgMusic.getStatus() != sf::Music::Playing) {
+            bgMusic.play();
+        }
         bgMusic.setLoop(true); // Make it repeat forever
     }
 }

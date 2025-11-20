@@ -3,6 +3,11 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+  </component>
   <component name="CMakePresetLoader">{
   &quot;useNewFormat&quot;: true
 }</component>
@@ -24,10 +29,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/img/main_menu_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/img/main_menu_bg.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Game.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/UI.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,6 +93,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
@@ -105,12 +118,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -123,7 +136,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1763461129119</updated>
-      <workItem from="1763461130745" duration="10020000" />
+      <workItem from="1763461130745" duration="10373000" />
+      <workItem from="1763512751477" duration="74000" />
+      <workItem from="1763528343004" duration="9416000" />
     </task>
     <servers />
   </component>

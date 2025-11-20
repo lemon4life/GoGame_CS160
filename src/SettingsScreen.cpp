@@ -1,6 +1,6 @@
 #include "SettingsScreen.h"
 #include <iostream>
-#include <algorithm> // for std::max/min
+#include <algorithm>
 
 SettingsScreen::SettingsScreen(GameSettings& s, StoneTextureManager& tm, AudioManager& am) 
     : settings(s), textureMgr(tm), audioMgr(am) 

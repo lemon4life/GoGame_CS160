@@ -4,7 +4,7 @@
 
 // --- Constants ---
 const int BOARD_SIZE = 19;
-const int WINDOW_WIDTH = 1000;
+const int WINDOW_WIDTH = 1050;
 const int WINDOW_HEIGHT = 850;
 const int GRID_OFFSET = 50;
 const float STONE_RADIUS = 20.0f;

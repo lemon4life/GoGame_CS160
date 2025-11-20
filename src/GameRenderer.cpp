@@ -35,27 +35,52 @@ void GameRenderer::drawBoard(sf::RenderTarget& window, const GameSettings& setti
         window.draw(line2, 2, sf::PrimitiveType::Lines);
 
         // --- 3. Draw Coordinates (Labels) ---
-        
-        // Draw Numbers (1-19) on the Left
-        // We use i + 1 to map index 0 to "1"
-        sf::Text numText(std::to_string(i + 1), font, 14); 
+
+        // ---------------------------------------------------------
+        // NUMBERS (Rows)
+        // ---------------------------------------------------------
+        std::string numStr = std::to_string(BOARD_SIZE - i);
+        sf::Text numText(numStr, font, 14);
         numText.setFillColor(sf::Color::Black);
         sf::FloatRect nb = numText.getLocalBounds();
-        numText.setOrigin(nb.width, nb.height / 2.0f); // Align right
-        // Position: slightly to the left of the grid line
+
+        // 1. Draw Numbers on the Left
+        numText.setOrigin(nb.width, nb.height / 2.0f); // Align right-center
         numText.setPosition(toScreenCoord(0, i).x - 15, toScreenCoord(0, i).y);
         window.draw(numText);
 
-        // Draw Letters (A-S) on the Top
-        // 'A' is char 65. So 'A' + 0 = A, 'A' + 1 = B...
+        // 2. Draw Numbers on the Right (NEW)
+        sf::Text rightNumText = numText; // Copy style
+        // Set origin to left-center so it draws outwards to the right
+        rightNumText.setOrigin(0, nb.height / 2.0f);
+        // Position at the X of the last column + offset
+        rightNumText.setPosition(toScreenCoord(BOARD_SIZE - 1, i).x + 15, toScreenCoord(BOARD_SIZE - 1, i).y);
+        window.draw(rightNumText);
+
+        // ---------------------------------------------------------
+        // LETTERS (Columns)
+        // ---------------------------------------------------------
         char letterChar = 'A' + i;
+        // Optional: Standard Go boards usually skip 'I' to avoid confusion with '1'.
+        // If you want that behavior, uncomment the line below:
+        // if (letterChar >= 'I') letterChar++;
+
         sf::Text charText(std::string(1, letterChar), font, 14);
         charText.setFillColor(sf::Color::Black);
         sf::FloatRect cb = charText.getLocalBounds();
-        charText.setOrigin(cb.width / 2.0f, cb.height); // Align bottom center
-        // Position: slightly above the grid line
+
+        // 3. Draw Letters on the Top
+        charText.setOrigin(cb.width / 2.0f, cb.height); // Align bottom-center
         charText.setPosition(toScreenCoord(i, 0).x, toScreenCoord(i, 0).y - 15);
         window.draw(charText);
+
+        // 4. Draw Letters on the Bottom (NEW)
+        sf::Text botCharText = charText; // Copy style
+        // Set origin to top-center so it draws downwards
+        botCharText.setOrigin(cb.width / 2.0f, 0);
+        // Position at the Y of the last row + offset
+        botCharText.setPosition(toScreenCoord(i, BOARD_SIZE - 1).x, toScreenCoord(i, BOARD_SIZE - 1).y + 15);
+        window.draw(botCharText);
     }
 
     // --- 4. Draw Star Points (Hoshi) ---

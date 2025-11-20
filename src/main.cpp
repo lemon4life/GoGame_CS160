@@ -41,7 +41,7 @@ int main() {
 
     sf::Font mainFont;
     if (!mainFont.loadFromFile("assets/fonts/arial.ttf")) {
-        // handle error
+        //handle error
     }
 
     while (window.isOpen()) {
