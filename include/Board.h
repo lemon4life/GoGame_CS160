@@ -50,7 +50,7 @@ public:
 
     // Returns true if the move was valid and successful
     bool make_move(int x, int y);
-    void pass_move();
+    bool pass_move();
 
     //Undo/Redo by one move
     //Doesn't handle overflow/underflow states
