@@ -15,6 +15,7 @@ void GoEngine::delete_branch(int move){
         history.board.pop_back();
         history.cur_hash.pop_back();
         history.consecutivePass.pop_back();
+        coorSaver.pop_back();
     }
 }
 
@@ -135,7 +136,7 @@ void GoEngine::clean_up_dead(){
 //--------PUBLIC FUNCTION DEFINITIONS----------
 
 void GoEngine::initialize_board(int Size){
-    boardSize = Size; cur_move = 0;
+    boardSize = Size; cur_move = 0; currentPlayer = Player::WHITE;
     board.clear(); board.assign(Size+1, vector<Player>(Size+1, Player::NONE));
     zobristTable.clear(); zobristTable.assign(Size+1, vector<vector<uint64_t>>(Size+1, vector<uint64_t>(2, 0)));
 
@@ -169,12 +170,14 @@ bool GoEngine::make_move(int x, int y){
     return true;
 }
 
-void GoEngine::pass_move(){
+bool GoEngine::pass_move(){
     cur_move++;
     delete_branch(cur_move);
     store_to_history();
     consecutivePass++;
-    if(consecutivePass == 2);
+    coorSaver.push_back({-1, -1});
+    if(consecutivePass == 2) return true;
+    return false;
 }
 
 void GoEngine::undo_step(){
@@ -296,4 +299,38 @@ pair<float, float> GoEngine::calculateScore(){
 
 bool GoEngine::saveGame(const std::string& filepath){
     ofstream outfile(filepath);
+
+    if (!outfile.is_open()) {
+        cerr << "Error: Could not open file for writing: " << filepath << endl;
+        return false;
+    }
+
+    outfile << boardSize << endl;
+    outfile << komi << endl;
+    outfile << cur_move << endl;
+    for(int i = 0; i < cur_move; i++) outfile << coorSaver[i].first << " " << coorSaver[i].second << endl;
+
+    outfile.close();
+    return true;
+}
+
+bool GoEngine::loadGame(const string& filepath){
+    ifstream infile(filepath);
+
+    if(!infile.is_open()){
+        cerr << "Error: Could not open file for reading: " << filepath << endl;
+        return false;
+    }
+
+    infile >> boardSize;
+    initialize_board(boardSize);
+    infile >> komi;
+    int mv; infile >> mv;
+
+    for(int i = 0; i < cur_move; i++){
+        int x = 0, y = 0;
+        infile >> x >> y;
+        make_move(x, y);
+    }
+
 }
