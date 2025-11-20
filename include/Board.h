@@ -11,10 +11,11 @@ enum class Player { NONE, WHITE, BLACK };
 class GoEngine {
 private: 
     std::vector<std::vector<Player>> board;
-    int boardSize, consecutivePass;
+    vector< vector<bool> > dead;
+    int boardSize, consecutivePass, komi = 6.5;
     Player currentPlayer;
     int cur_move; uint64_t cur_hash;
-
+    vector<pair<int, int>> coorSaver;
     vector<vector<vector<uint64_t>>> zobristTable;
     unordered_map<uint64_t, int> superkoMap;
     struct hist{
@@ -39,6 +40,9 @@ private:
     void initZobrist(int brd);
     uint64_t calcZobrist();
     bool checkSuperko();
+
+
+    void clean_up_dead();
 public:
     
     // Constructor
@@ -61,11 +65,13 @@ public:
 
     // --- SCORING ---
     // Returns a pair: {BlackScore, WhiteScore}
-    std::pair<float, float> calculateScore() const;
+    void deadStoneHeuristic();
+    void toggle_life_death(int x, int y);
+    std::pair<float, float> calculateScore();
 
     // --- SAVE/LOAD ---
-    bool saveGame(const std::string& filename);
-    bool loadGame(const std::string& filename);
+    bool saveGame(const std::string& filepath);
+    bool loadGame(const std::string& filepath);
 };
 
 #endif

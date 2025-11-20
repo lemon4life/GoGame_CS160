@@ -142,6 +142,7 @@ void GoEngine::initialize_board(int Size){
     superkoMap.clear();
     cur_hash = 0;
     history = {};
+    coorSaver.clear();
     consecutivePass = 0;
     store_to_history();
     initZobrist(Size);
@@ -163,6 +164,7 @@ bool GoEngine::make_move(int x, int y){
     }
     delete_branch(cur_move);
     store_to_history();
+    coorSaver.push_back({x, y});
     consecutivePass = 0;
     return true;
 }
@@ -290,4 +292,8 @@ pair<float, float> GoEngine::calculateScore(){
         }
     }
     return {Bpt, Wpt};
+}
+
+bool GoEnginge::saveGame(const string& filepath){
+    ofstream outfile(filepath);
 }
