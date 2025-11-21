@@ -44,10 +44,12 @@ bool GoGame::placeStone(int x, int y) {
     // make_move handles rules, captures, ko, and history
     bool success = engine.make_move(engineX, engineY, captured);
 
-    if (captured) {
-        audio.playCapture();
-    } else if (success) {
-        audio.playPlaceStone();
+    if (success) {
+        if (captured) {
+            audio.playCapture();
+        } else {
+                audio.playPlaceStone();
+            }
     }
     return success;
 }

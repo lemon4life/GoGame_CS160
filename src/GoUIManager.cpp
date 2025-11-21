@@ -61,7 +61,7 @@ bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWind
             std::string label = buttonLabels[i];
 
             if (label == "EXIT GAME") {
-                currentGameState = GameState::EXIT;
+                currentGameState = GameState::MENU;
             }
             else if (label == "RESET GAME" || label == "START NEW GAME") {
                 game.resetGame();

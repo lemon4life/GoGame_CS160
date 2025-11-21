@@ -49,6 +49,7 @@ int main() {
     loadScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "LOAD GAME");
 
     GameState currentGameState = GameState::MENU;
+    bool whilePlaying = false;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -78,11 +79,15 @@ int main() {
                     currentGameState = newState;
                 }
                 // --- STATE: SETTINGS ---
-                else if (currentGameState == GameState::SETTINGS) {
-                    currentGameState = settingsScreen.handleClick(mousePos);
+                else if (currentGameState == GameState::SETTINGS){
+                    if (settingsScreen.handleClick(mousePos)) {
+                        currentGameState = (whilePlaying ? GameState::PLAYING : GameState::MENU);
+                    }
+
                 }
                 // --- STATE: PLAYING ---
                 else if (currentGameState == GameState::PLAYING) {
+                    whilePlaying = true;
                     if (mousePos.x >= BOARD_MAX_WIDTH) {
                         // Check Sidebar Clicks
                         GameState oldState = currentGameState;
