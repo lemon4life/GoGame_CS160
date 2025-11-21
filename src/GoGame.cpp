@@ -48,20 +48,33 @@ bool GoGame::placeStone(int x, int y) {
         if (captured) {
             audio.playCapture();
         } else {
-                audio.playPlaceStone();
-            }
+            audio.playPlaceStone();
+        }
+    } else {
+        audio.playError();
     }
     return success;
 }
 
 bool GoGame::undo() {
-    engine.undo_step();
-    return true;
+    if (engine.undo_step()) {
+        audio.playPlaceStone();
+        return true;
+    } else {
+        audio.playError();
+        return false;
+    }
 }
 
 bool GoGame::redo() {
-    engine.redo_step();
-    return true;
+    if (engine.redo_step()) {
+        audio.playPlaceStone();
+        return true;
+    } else {
+        audio.playError();
+        return false;
+    }
+
 }
 
 void GoGame::resetGame() {

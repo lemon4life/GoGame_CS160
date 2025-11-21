@@ -10,6 +10,10 @@ AudioManager::AudioManager(GameSettings& s) : settings(s) {
         std::cerr << "[AudioManager] Error: capture.mp3 missing" << std::endl;
     }
 
+    if (!errorBuffer.loadFromFile("assets/audio/effects/rizz.mp3")) {
+        std::cerr << "[AudioManager] Error:rizz.mp3 missing" << std::endl;
+    }
+
     //Setup BGM Lists
     bgmFiles = {
         "assets/audio/BGM/Judgment_of_Euthymia.mp3",
@@ -30,14 +34,21 @@ AudioManager::AudioManager(GameSettings& s) : settings(s) {
 void AudioManager::playPlaceStone() {
     if (!settings.soundEnabled) return;
     soundEffect.setBuffer(placeBuffer);
-    soundEffect.setVolume(settings.volume);
+    //soundEffect.setVolume(settings.volume);
+    soundEffect.play();
+}
+
+void AudioManager::playError() {
+    if (!settings.soundEnabled) return;
+    soundEffect.setBuffer(errorBuffer);
+    //soundEffect.setVolume(settings.volume);
     soundEffect.play();
 }
 
 void AudioManager::playCapture() {
     if (!settings.soundEnabled) return;
     soundEffect.setBuffer(captureBuffer);
-    soundEffect.setVolume(settings.volume);
+    //soundEffect.setVolume(settings.volume);
     soundEffect.play();
 }
 

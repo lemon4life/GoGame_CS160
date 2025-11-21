@@ -11,6 +11,7 @@ private:
     // Sound Effects
     sf::SoundBuffer placeBuffer;
     sf::SoundBuffer captureBuffer;
+    sf::SoundBuffer errorBuffer;
     sf::Sound soundEffect;
 
     // Music
@@ -23,6 +24,7 @@ public:
 
     void playPlaceStone();
     void playCapture();
+    void playError();
 
     void updateMusicState(); // Handles Volume & On/Off logic
     void changeBGM(int index); // Handles track switching

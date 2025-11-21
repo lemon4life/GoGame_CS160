@@ -37,6 +37,8 @@ struct GameSettings {
     bool soundEnabled = true;
     bool musicEnabled = true;
     float volume = 50.0f;
+    // float bgmvolume = 50.0f;
+    // float effectvolume = 50.0f;
 
     std::string getBoardImagePath() const {
         if (boardThemeIndex == 1) return "assets/img/background/ocean.jpg";
