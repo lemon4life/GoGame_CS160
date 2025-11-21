@@ -7,16 +7,35 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 2. Tell CMake where to find our header files
-# This lets src/main.cpp write #include "Game.h"
 include_directories(include)
 
-# 3. Find SFML (vcpkg makes this work)
-# We ask for version 2.6.1 and the components we need
-find_package(SFML 2.6.1 REQUIRED COMPONENTS system window graphics audio)
-# Note: Add 'network' if you need it.
+# ==============================================================================
+# 3. THE "PEACE TREATY" BLOCK (UNIVERSAL SFML SETUP)
+# This block automatically detects which computer is running the code.
+# ==============================================================================
+
+# Check if the local "SFML-2.6.1" folder exists (This matches YOUR setup)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SFML-2.6.1/CMakeLists.txt")
+    message(STATUS ">> Detected Local SFML folder. Mode: STATIC BUILD (For You)")
+
+    # Force Static build to fix the "windres" error on your machine
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+    # Build SFML from the local folder
+    add_subdirectory(SFML-2.6.1)
+
+    # If the folder is missing, assume we are on HER computer (MSYS2)
+else()
+    message(STATUS ">> Local SFML not found. Mode: SYSTEM PACKAGE (For Her)")
+
+    # Use the Package Manager (how she was doing it originally)
+    find_package(SFML 2.6.1 REQUIRED COMPONENTS system window graphics audio)
+endif()
+
+# ==============================================================================
 
 # 4. Define our executable
-# We list ALL .cpp files from the src/ folder
+# I kept her new files (SaveScreen/LoadScreen) in this list
 add_executable(GoGame_CS160
         src/main.cpp
         include/Definitions.h
@@ -40,16 +59,13 @@ add_executable(GoGame_CS160
         src/SaveLoadScreen.cpp
         src/SaveScreen.cpp
         src/LoadScreen.cpp
-        # Add any other .cpp files you create here
 )
 
 # 5. Link SFML to our executable
-# This tells the compiler to attach the SFML libraries
+# This works for both methods now
 target_link_libraries(GoGame_CS160 PRIVATE sfml-system sfml-window sfml-graphics sfml-audio)
 
-# 6. [IMPORTANT] Copy assets to the build folder
-# Your .exe runs from a 'cmake-build-debug' folder,
-# so it can't find the 'assets' folder unless we copy it.
+# 6. Copy assets to the build folder
 set(ASSETS_DIR ${CMAKE_SOURCE_DIR}/assets)
 set(DESTINATION_DIR ${CMAKE_BINARY_DIR})
 
@@ -59,3 +75,14 @@ add_custom_command(TARGET GoGame_CS160 POST_BUILD
         ${DESTINATION_DIR}/assets
         COMMENT "Copying assets..."
 )
+
+# 7. [AUTO-FIX] Copy OpenAL32.dll (Audio Fix for YOU)
+# This puts the sound driver next to the .exe so you don't crash
+if(WIN32 AND EXISTS "${CMAKE_SOURCE_DIR}/SFML-2.6.1/extlibs/bin/x64/openal32.dll")
+    add_custom_command(TARGET GoGame_CS160 POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/SFML-2.6.1/extlibs/bin/x64/openal32.dll"
+            $<TARGET_FILE_DIR:GoGame_CS160>
+            COMMENT "Auto-fixing Audio DLL..."
+    )
+endif()

@@ -12,7 +12,7 @@ class GoEngine {
 private: 
     std::vector<std::vector<Player>> board;
     vector< vector<bool> > dead;
-    int boardSize, consecutivePass, komi = 6.5;
+    int boardSize, consecutivePass; float komi = 6.5;
     Player currentPlayer;
     int cur_move; uint64_t cur_hash;
     vector<pair<int, int>> coorSaver;
@@ -34,7 +34,7 @@ private:
     void delete_clump(int x_coor, int y_coor);
     bool check_survivability(int x_coor, int y_coor);
 
-    bool reassest_board_state(int x, int y);
+    bool reassest_board_state(int x, int y, bool& didCaptured);
 
 
     void initZobrist(int brd);
@@ -49,13 +49,13 @@ public:
     void initialize_board(int boardSize);
 
     // Returns true if the move was valid and successful
-    bool make_move(int x, int y);
+    bool make_move(int x, int y, bool& didCaptured);
     bool pass_move();
 
     //Undo/Redo by one move
     //Doesn't handle overflow/underflow states
-    void undo_step();
-    void redo_step();
+    bool undo_step();
+    bool redo_step();
 
     // Returns the current player
     Player getCurrentPlayer() const;

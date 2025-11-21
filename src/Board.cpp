@@ -72,12 +72,12 @@ bool GoEngine::check_survivability(int x_coor, int y_coor){
     return 1;
 }
 
-bool GoEngine::reassest_board_state(int x, int y){
+bool GoEngine::reassest_board_state(int x, int y, bool& didCaptured){
     for(int i = 0; i < 4; i++){
         auto [xn, yn] = spread(x, y, i);
         if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
             if(board[xn][yn] != Player::NONE && board[xn][yn] != board[x][y]) {
-                check_survivability(xn, yn);
+                if(!check_survivability(xn, yn)) didCaptured = 1;
             }
         }
     }
@@ -149,8 +149,9 @@ void GoEngine::initialize_board(int Size){
     initZobrist(Size);
 }
 
-bool GoEngine::make_move(int x, int y){
+bool GoEngine::make_move(int x, int y, bool& didCaptured){
     cur_move++;
+    didCaptured = 0;
     switchPlayer();
     if(board[x][y] != Player::NONE) {
         cur_move--;
@@ -158,7 +159,7 @@ bool GoEngine::make_move(int x, int y){
         return false;
     }
     board[x][y] = currentPlayer;
-    if(!reassest_board_state(x, y)){
+    if(!reassest_board_state(x, y, didCaptured)){
         cur_move--;
         switchPlayer();
         board = history.board[cur_move];
@@ -175,6 +176,7 @@ bool GoEngine::make_move(int x, int y){
 
 bool GoEngine::pass_move(){
     cur_move++;
+    switchPlayer();
     delete_branch(cur_move);
     store_to_history();
     consecutivePass++;
@@ -183,7 +185,8 @@ bool GoEngine::pass_move(){
     return false;
 }
 
-void GoEngine::undo_step(){
+bool GoEngine::undo_step(){
+    if(cur_move == 0) return false;
     cur_move--;
     switchPlayer();
     //cout << cur_move << endl;
@@ -191,13 +194,17 @@ void GoEngine::undo_step(){
     cur_hash = history.cur_hash[cur_move];
     board = history.board[cur_move];
     consecutivePass = history.consecutivePass[cur_move];
+    return true;
 }
 
-void GoEngine::redo_step(){
+bool GoEngine::redo_step(){
+    if(cur_move == history.board.size() - 1) return false;
     cur_move++;
+    switchPlayer();
     cur_hash = history.cur_hash[cur_move]; superkoMap[cur_hash]++;
     board = history.board[cur_move];
     consecutivePass = history.consecutivePass[cur_move];
+    return true;
 }
 
 Player GoEngine::getCurrentPlayer() const{
@@ -329,11 +336,12 @@ bool GoEngine::loadGame(const string& filepath){
     initialize_board(boardSize);
     infile >> komi;
     int mv; infile >> mv;
-
-    for(int i = 0; i < cur_move; i++){
+    for(int i = 0; i < mv; i++){
         int x = 0, y = 0;
         infile >> x >> y;
-        make_move(x, y);
+        bool dc = 0;
+        make_move(x, y, dc);
     }
-
+    infile.close();
+    return true;
 }
