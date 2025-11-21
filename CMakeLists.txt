@@ -18,9 +18,7 @@ find_package(SFML 2.6.1 REQUIRED COMPONENTS system window graphics audio)
 # 4. Define our executable
 # We list ALL .cpp files from the src/ folder
 add_executable(GoGame_CS160
-        #src/UI.cpp
         src/main.cpp
-        #src/board.cpp
         include/Definitions.h
         include/TextureManager.h
         src/TextureManager.cpp
@@ -40,6 +38,8 @@ add_executable(GoGame_CS160
         src/Board.cpp
         include/SaveLoadScreen.h
         src/SaveLoadScreen.cpp
+        src/SaveScreen.cpp
+        src/LoadScreen.cpp
         # Add any other .cpp files you create here
 )
 

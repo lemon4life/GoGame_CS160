@@ -1,112 +1,206 @@
 #include "SaveLoadScreen.h"
-#include <filesystem> // C++17
+#include <filesystem>
+#include <cstdio>
 #include <iostream>
-#include <cstdio> // For std::remove
 
 namespace fs = std::filesystem;
 
-void SaveLoadScreen::init(const sf::Font& font, float width, float height) {
-    // 1. Background Overlay (Semi-transparent)
+const float PREVIEW_X = 600.0f;
+const float PREVIEW_Y = 150.0f;
+const float PREVIEW_SIZE = 350.0f;
+const float SLOT_START_Y = 150.0f;
+
+// --- BASE CLASS IMPLEMENTATION ---
+
+void BaseSlotScreen::init(const sf::Font& font, float width, float height, const std::string& title) {
+    // 1. Setup UI Elements
     m_background.setSize(sf::Vector2f(width, height));
-    m_background.setFillColor(sf::Color(0, 0, 0, 220));
+    m_background.setFillColor(sf::Color(30, 30, 30, 240));
 
-    // 2. Title
     m_titleText.setFont(font);
-    m_titleText.setCharacterSize(40);
-    m_titleText.setFillColor(sf::Color::White);
-    m_titleText.setPosition(50, 40);
+    m_titleText.setCharacterSize(50);
+    m_titleText.setFillColor(sf::Color(220, 220, 220));
+    m_titleText.setPosition(80, 50);
+    m_titleText.setString(title);
 
-    // 3. Back Button
     m_backButton.setSize(sf::Vector2f(100, 40));
-    m_backButton.setFillColor(sf::Color(100, 100, 100));
-    m_backButton.setPosition(width - 150, 40);
-    m_backButton.setOutlineThickness(2);
-    m_backButton.setOutlineColor(sf::Color::White);
+    m_backButton.setFillColor(sf::Color(100, 150, 100));
+    m_backButton.setPosition(width - 150, 60);
 
     m_backButtonText.setFont(font);
     m_backButtonText.setString("Back");
     m_backButtonText.setCharacterSize(20);
     m_backButtonText.setFillColor(sf::Color::White);
-    // Center text roughly
-    m_backButtonText.setPosition(width - 125, 48);
+    m_backButtonText.setPosition(width - 130, 68);
 
-    // 4. Initialize 5 Slots
-    float startY = 120;
+    m_previewBoardBg.setSize(sf::Vector2f(PREVIEW_SIZE + 20, PREVIEW_SIZE + 20));
+    m_previewBoardBg.setPosition(PREVIEW_X - 10, PREVIEW_Y - 10);
+    m_previewBoardBg.setFillColor(sf::Color(222, 184, 135));
+
+    m_infoText.setFont(font);
+    m_infoText.setCharacterSize(20);
+    m_infoText.setFillColor(sf::Color::White);
+    m_infoText.setPosition(PREVIEW_X, PREVIEW_Y + PREVIEW_SIZE + 20);
+
+    m_actionBtn.setSize(sf::Vector2f(300, 60));
+    m_actionBtn.setPosition(PREVIEW_X + 25, PREVIEW_Y + PREVIEW_SIZE + 80);
+
+    m_actionBtnText.setFont(font);
+    m_actionBtnText.setCharacterSize(20);
+    m_actionBtnText.setFillColor(sf::Color::White);
+
+    // 2. Initialize Slots
+    float currentY = SLOT_START_Y;
+    m_slots.clear();
     for (int i = 1; i <= 5; ++i) {
         SaveSlot slot;
         slot.id = i;
-        
-        // Main Bar
-        slot.shape.setSize(sf::Vector2f(400, 60));
-        slot.shape.setPosition(100, startY);
+        slot.shape.setSize(sf::Vector2f(300, 50));
+        slot.shape.setPosition(80, currentY);
         slot.shape.setOutlineThickness(2);
-        slot.shape.setOutlineColor(sf::Color(200, 200, 200));
-
-        // Label
         slot.labelText.setFont(font);
-        slot.labelText.setCharacterSize(24);
-        slot.labelText.setFillColor(sf::Color::White);
-        slot.labelText.setPosition(120, startY + 15);
+        slot.labelText.setCharacterSize(20);
+        slot.labelText.setPosition(100, currentY + 12);
 
-        // Delete Button (Red X)
-        slot.delBtn.setSize(sf::Vector2f(60, 60)); // Square
-        slot.delBtn.setPosition(520, startY); // Right next to bar
-        slot.delBtn.setFillColor(sf::Color(200, 50, 50)); // Red
-        slot.delBtn.setOutlineThickness(2);
-        slot.delBtn.setOutlineColor(sf::Color::White);
+        slot.delBtn.setSize(sf::Vector2f(40, 40));
+        slot.delBtn.setPosition(400, currentY + 5);
+        slot.delBtn.setFillColor(sf::Color(200, 60, 60));
 
         slot.delBtnText.setFont(font);
         slot.delBtnText.setString("X");
-        slot.delBtnText.setCharacterSize(30);
-        slot.delBtnText.setFillColor(sf::Color::White);
-        slot.delBtnText.setPosition(540, startY + 10);
+        slot.delBtnText.setCharacterSize(20);
+        slot.delBtnText.setPosition(412, currentY + 8);
 
         m_slots.push_back(slot);
-        startY += 80; // Spacing
+        currentY += 70;
     }
+
+    // 3. CRITICAL: Initialize Preview Engine
+    // If this is missing, loadGame() on preview will crash
+    m_previewEngine.initialize_board(19);
+
+    m_showPreview = false;
+    m_showActionBtn = false;
+    m_selectedSlotId = -1;
 }
 
-void SaveLoadScreen::setMode(bool isSave) {
-    m_isSaveMode = isSave;
-    m_titleText.setString(isSave ? "SAVE GAME" : "LOAD GAME");
-    refreshSlots();
-}
-
-std::string SaveLoadScreen::getFilePath(int id) {
+std::string BaseSlotScreen::getFilePath(int id) {
     return "saves/save_0" + std::to_string(id) + ".txt";
 }
 
-void SaveLoadScreen::refreshSlots() {
-    // Create directory if missing
-    if (!fs::exists("saves")) {
-        fs::create_directory("saves");
-    }
+void BaseSlotScreen::refreshSlots() {
+    if (!fs::exists("saves")) fs::create_directory("saves");
 
     for (auto& slot : m_slots) {
         std::string path = getFilePath(slot.id);
         if (fs::exists(path)) {
             slot.isEmpty = false;
-            slot.shape.setFillColor(sf::Color(100, 150, 100)); // Green for occupied
-            slot.labelText.setString("Save Slot " + std::to_string(slot.id) + " (Occupied)");
+            slot.shape.setFillColor(sf::Color(60, 60, 60));
+            slot.labelText.setString("save_0" + std::to_string(slot.id));
+            slot.labelText.setFillColor(sf::Color::White);
         } else {
             slot.isEmpty = true;
-            slot.shape.setFillColor(sf::Color(60, 60, 60)); // Grey for empty
-            slot.labelText.setString("Save Slot " + std::to_string(slot.id) + " (Empty)");
+            slot.shape.setFillColor(sf::Color(40, 40, 40));
+            slot.labelText.setString("Empty Slot");
+            slot.labelText.setFillColor(sf::Color(100, 100, 100));
+        }
+
+        if (slot.id == m_selectedSlotId) slot.shape.setOutlineColor(sf::Color::Yellow);
+        else slot.shape.setOutlineColor(sf::Color(100, 100, 100));
+    }
+}
+
+void BaseSlotScreen::updatePreview(int slotId) {
+    // If we click a different slot, reload preview
+    if (slotId != m_selectedSlotId) {
+        m_selectedSlotId = slotId;
+        std::string path = getFilePath(slotId);
+
+        if (fs::exists(path)) {
+            // Try loading. If preview engine wasn't init, this might crash.
+            if (m_previewEngine.loadGame(path)) {
+                m_showPreview = true;
+                std::string pName = (m_previewEngine.getCurrentPlayer() == Player::BLACK) ? "Black" : "White";
+                m_infoText.setString("Turn: " + pName + "\n2-Player Mode");
+            }
+        } else {
+            m_showPreview = false;
+            m_infoText.setString("Empty Slot");
+        }
+    }
+    // Always refresh UI colors and button text
+    refreshSlots();
+    updateActionButtonState();
+}
+
+void BaseSlotScreen::drawPreviewBoard(sf::RenderWindow& window, const StoneTextureManager& tm) {
+    window.draw(m_previewBoardBg);
+    if (!m_showPreview) return;
+
+    int boardSize = 19;
+    float cellSize = PREVIEW_SIZE / (boardSize + 1);
+    float stoneRadius = cellSize * 0.45f;
+
+    sf::RectangleShape line;
+    line.setFillColor(sf::Color::Black);
+
+    for (int i = 1; i <= boardSize; ++i) {
+        float pos = i * cellSize;
+        line.setSize(sf::Vector2f(2, PREVIEW_SIZE - 2 * cellSize));
+        line.setPosition(PREVIEW_X + pos, PREVIEW_Y + cellSize);
+        window.draw(line);
+        line.setSize(sf::Vector2f(PREVIEW_SIZE - 2 * cellSize, 2));
+        line.setPosition(PREVIEW_X + cellSize, PREVIEW_Y + pos);
+        window.draw(line);
+    }
+
+    const auto& board = m_previewEngine.getBoard();
+    sf::CircleShape stone(stoneRadius);
+    stone.setOrigin(stoneRadius, stoneRadius);
+
+    // Pointer fix for textures
+    const sf::Texture* blackTex = &tm.getTexture(Stone::Black, 0);
+    const sf::Texture* whiteTex = &tm.getTexture(Stone::White, 0);
+
+    for (int y = 1; y <= boardSize; ++y) {
+        for (int x = 1; x <= boardSize; ++x) {
+            // Safety check for vector bounds
+            if (y >= board.size() || x >= board[y].size()) continue;
+
+            Player p = board[x][y];
+            if (p == Player::NONE) continue;
+
+            if (p == Player::BLACK) stone.setTexture(blackTex);
+            else stone.setTexture(whiteTex);
+
+            stone.setPosition(PREVIEW_X + x * cellSize, PREVIEW_Y + y * cellSize);
+            window.draw(stone);
         }
     }
 }
 
-void SaveLoadScreen::draw(sf::RenderWindow& window) {
+void BaseSlotScreen::draw(sf::RenderWindow& window, const StoneTextureManager& tm) {
     window.draw(m_background);
     window.draw(m_titleText);
     window.draw(m_backButton);
     window.draw(m_backButtonText);
 
+    if (m_selectedSlotId != -1) {
+        window.draw(m_infoText);
+        if (m_showActionBtn) {
+            window.draw(m_actionBtn);
+            window.draw(m_actionBtnText);
+        }
+        // Only draw preview if we have one
+        if(m_showPreview) {
+            drawPreviewBoard(window, tm);
+        }
+    }
+
     for (const auto& slot : m_slots) {
         window.draw(slot.shape);
         window.draw(slot.labelText);
-        
-        // Only show delete button if file exists
+        // Only draw delete button if slot occupied
         if (!slot.isEmpty) {
             window.draw(slot.delBtn);
             window.draw(slot.delBtnText);
@@ -114,32 +208,6 @@ void SaveLoadScreen::draw(sf::RenderWindow& window) {
     }
 }
 
-int SaveLoadScreen::handleMouseClick(const sf::Vector2i& mousePos) {
-    // 1. Check Back Button
-    if (m_backButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
-        return -2; // Back signal
-    }
-
-    // 2. Check Slots
-    for (const auto& slot : m_slots) {
-        float mx = static_cast<float>(mousePos.x);
-        float my = static_cast<float>(mousePos.y);
-
-        // Check Delete Button (Only if not empty)
-        if (!slot.isEmpty && slot.delBtn.getGlobalBounds().contains(mx, my)) {
-            std::string path = "saves/save_0" + std::to_string(slot.id) + ".txt";
-            std::remove(path.c_str());
-            refreshSlots(); // Update UI immediately
-            return -1; // Handled internally, no main loop action needed
-        }
-
-        // Check Slot Bar Click
-        if (slot.shape.getGlobalBounds().contains(mx, my)) {
-            // If loading, only allow clicking occupied slots
-            if (!m_isSaveMode && slot.isEmpty) return -1;
-            
-            return slot.id; // Return the ID so main loop can save/load
-        }
-    }
-    return -1;
+void BaseSlotScreen::handleMouseMove(const sf::Vector2i& mousePos) {
+    // Optional hover logic
 }

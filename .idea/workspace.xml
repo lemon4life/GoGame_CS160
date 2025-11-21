@@ -29,13 +29,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/include/SaveLoadScreen.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LoadScreen.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/SaveScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GoGame.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoGame.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SaveLoadScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SaveLoadScreen.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoUIManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainMenuScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Board.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +91,7 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "CMake Application.GoGame.executor": "Run",
-    "CMake Application.GoGame_CS160.executor": "Debug",
+    "CMake Application.GoGame_CS160.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -120,12 +123,12 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>

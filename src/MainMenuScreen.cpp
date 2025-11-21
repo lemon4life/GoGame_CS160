@@ -34,7 +34,6 @@ MainMenuScreen::MainMenuScreen() {
     
     sf::FloatRect titleBounds = titleText.getLocalBounds();
     titleText.setOrigin(titleBounds.width / 2.0f, titleBounds.height / 2.0f);
-    // Center title roughly above buttons
     titleText.setPosition(MENU_START_X + MENU_BTN_WIDTH / 2.0f, 150);
 
     // Setup Buttons
@@ -50,7 +49,7 @@ MainMenuScreen::MainMenuScreen() {
 
         sf::Text text(label, buttonFont, 24);
         text.setFillColor(sf::Color::White);
-        
+
         sf::FloatRect textBounds = text.getLocalBounds();
         text.setOrigin(textBounds.width / 2.0f, textBounds.height / 2.0f);
         text.setPosition(
@@ -78,15 +77,14 @@ GameState MainMenuScreen::handleEvent(const sf::Event& event, const sf::Vector2i
                     static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
             {
                 std::string label = buttonLabels[i];
+
                 if (label == "NEW GAME") {
                     game.resetGame();
                     return GameState::PLAYING;
-                } 
+                }
                 else if (label == "LOAD GAME") {
-                    if (game.loadGame("savegame.txt")) {
-                        return GameState::PLAYING;
-                    }
-                    // If load fails, stay on menu
+                    // CHANGE: Return LOAD_MENU state instead of loading immediately
+                    return GameState::LOAD_MENU;
                 } 
                 else if (label == "SETTINGS") {
                     return GameState::SETTINGS;

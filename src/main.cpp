@@ -6,7 +6,7 @@
 #include "MainMenuScreen.h"
 #include "SettingsScreen.h"
 #include "GameRenderer.h"
-#include "SaveLoadScreen.h"
+#include "SaveLoadScreen.h" // <--- Just this one header
 #include <cmath>
 
 void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& ui) {
@@ -25,31 +25,29 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Go Game Ultimate");
     window.setFramerateLimit(60);
 
+    // 1. Init Game Systems
     GameSettings settings;
     AudioManager audioManager(settings);
     StoneTextureManager textureManager;
     GoGame game(audioManager);
 
+    // 2. Init UI Screens
     GoUIManager ui(game);
     MainMenuScreen mainMenu;
     SettingsScreen settingsScreen(settings, textureManager, audioManager);
 
-    // --- NEW: Initialize SaveLoadScreen ---
-    SaveLoadScreen saveLoadScreen;
+    // 3. Init Save & Load Screens
+    SaveScreen saveScreen;
+    LoadScreen loadScreen;
 
-    // Load font once to use for all screens
-    sf::Font mainFont;
-    sf::Font boldFont;
-    if (!mainFont.loadFromFile("assets/fonts/arial.ttf")) { /* Error */ }
-    if (!boldFont.loadFromFile("assets/fonts/arialbd.ttf")) { /* Error */ }
+    sf::Font font;
+    if (!font.loadFromFile("assets/fonts/arialbd.ttf")) {
+        // Handle Error
+    }
 
-    saveLoadScreen.init(boldFont, WINDOW_WIDTH, WINDOW_HEIGHT);
-    // ---------------------------------------
+    saveScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "SAVE GAME");
+    loadScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "LOAD GAME");
 
-    // Add SAVE and LOAD to your GameState enum if not already there!
-    // Or use existing ones. Let's assume you added them to Definitions.h
-    // If not, define them locally or update Definitions.h:
-    // enum class GameState { MENU, PLAYING, SETTINGS, SAVE_MENU, LOAD_MENU };
     GameState currentGameState = GameState::MENU;
 
     while (window.isOpen()) {
@@ -57,93 +55,95 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
 
+            // --- MOUSE MOVE ---
+            if (event.type == sf::Event::MouseMoved) {
+                sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
+                if (currentGameState == GameState::SAVE_MENU) {
+                    saveScreen.handleMouseMove(mousePos);
+                } else if (currentGameState == GameState::LOAD_MENU) {
+                    loadScreen.handleMouseMove(mousePos);
+                }
+            }
+
+            // --- MOUSE CLICK ---
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
 
-                // --- 1. MENU STATE ---
+                // --- STATE: MAIN MENU ---
                 if (currentGameState == GameState::MENU) {
-                    currentGameState = mainMenu.handleEvent(event, mousePos, game);
-
-                    // Check if Main Menu triggered Load Game directly
-                    // (You might need to add a "Load" button to MainMenu logic)
-                    // if (currentGameState == GameState::PLAYING && wantsLoad) {
-                    //      currentGameState = GameState::LOAD_MENU;
-                    //      saveLoadScreen.setMode(false);
-                    // }
+                    GameState newState = mainMenu.handleEvent(event, mousePos, game);
+                    if (newState == GameState::LOAD_MENU) {
+                        loadScreen.refreshSlots();
+                    }
+                    currentGameState = newState;
                 }
-                // --- 2. PLAYING STATE ---
+                // --- STATE: SETTINGS ---
+                else if (currentGameState == GameState::SETTINGS) {
+                    currentGameState = settingsScreen.handleClick(mousePos);
+                }
+                // --- STATE: PLAYING ---
                 else if (currentGameState == GameState::PLAYING) {
                     if (mousePos.x >= BOARD_MAX_WIDTH) {
-                        // Handle UI Panel Clicks
-                        // Check if user clicked "Save" or "Load" buttons in the side panel
-                        // You need to implement these buttons in GoUIManager
-
-                        /* Example Logic:
-                        if (ui.isSaveButtonClicked(mousePos)) {
-                            currentGameState = GameState::SAVE_MENU;
-                            saveLoadScreen.setMode(true); // Save Mode
-                        }
-                        else if (ui.isLoadButtonClicked(mousePos)) {
-                            currentGameState = GameState::LOAD_MENU;
-                            saveLoadScreen.setMode(false); // Load Mode
-                        }
-                        */
-
+                        // Check Sidebar Clicks
+                        GameState oldState = currentGameState;
                         ui.handleButtonClick(mousePos, window, currentGameState);
+
+                        if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
+                        if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
                     } else {
                         handleBoardClick(game, mousePos, ui);
                     }
                 }
-                // --- 3. SAVE/LOAD MENU STATE ---
-                else if (currentGameState == GameState::SAVE_MENU || currentGameState == GameState::LOAD_MENU) {
-                    int action = saveLoadScreen.handleMouseClick(mousePos);
+                // --- STATE: SAVE MENU ---
+                else if (currentGameState == GameState::SAVE_MENU) {
+                    int action = saveScreen.handleMouseClick(mousePos);
 
                     if (action == -2) {
-                        // Back button -> Return to Game
                         currentGameState = GameState::PLAYING;
                     }
                     else if (action > 0) {
-                        // Slot clicked (1-5)
                         std::string filename = "saves/save_0" + std::to_string(action) + ".txt";
-
-                        if (currentGameState == GameState::SAVE_MENU) {
-                            if (game.saveGame(filename)) {
-                                ui.setNotification("Game Saved!");
-                                saveLoadScreen.refreshSlots(); // Update color to green
-                            }
-                        }
-                        else {
-                            if (game.loadGame(filename)) {
-                                ui.setNotification("Game Loaded!");
-                                currentGameState = GameState::PLAYING; // Go back to game
-                            }
+                        if (game.saveGame(filename)) {
+                            ui.setNotification("Game Saved!");
+                            saveScreen.refreshSlots();
                         }
                     }
                 }
-                // --- 4. SETTINGS STATE ---
-                else if (currentGameState == GameState::SETTINGS) {
-                    currentGameState = settingsScreen.handleClick(mousePos);
+                // --- STATE: LOAD MENU ---
+                else if (currentGameState == GameState::LOAD_MENU) {
+                    int action = loadScreen.handleMouseClick(mousePos);
+
+                    if (action == -2) {
+                        if (game.getCurrentPlayer() == Stone::Empty) currentGameState = GameState::MENU;
+                        else currentGameState = GameState::PLAYING;
+                    }
+                    else if (action > 0) {
+                        std::string filename = "saves/save_0" + std::to_string(action) + ".txt";
+                        if (game.loadGame(filename)) {
+                            ui.setNotification("Game Loaded!");
+                            currentGameState = GameState::PLAYING;
+                        }
+                    }
                 }
             }
 
-            // Shortcut keys for testing (Ctrl+S = Save Menu, Ctrl+L = Load Menu)
-            if (event.type == sf::Event::KeyPressed) {
-                if (currentGameState == GameState::PLAYING) {
-                    if (event.key.code == sf::Keyboard::S && event.key.control) {
-                        currentGameState = GameState::SAVE_MENU;
-                        saveLoadScreen.setMode(true);
-                    }
-                    if (event.key.code == sf::Keyboard::L && event.key.control) {
-                        currentGameState = GameState::LOAD_MENU;
-                        saveLoadScreen.setMode(false);
-                    }
+            // --- KEYBOARD SHORTCUTS ---
+            if (event.type == sf::Event::KeyPressed && currentGameState == GameState::PLAYING) {
+                if (event.key.code == sf::Keyboard::S && event.key.control) {
+                    currentGameState = GameState::SAVE_MENU;
+                    saveScreen.refreshSlots();
+                }
+                if (event.key.code == sf::Keyboard::L && event.key.control) {
+                    currentGameState = GameState::LOAD_MENU;
+                    loadScreen.refreshSlots();
                 }
             }
         }
 
         window.clear();
 
-        // Render Logic
+        // --- RENDER LOGIC ---
+
         if (currentGameState == GameState::MENU) {
             mainMenu.draw(window);
         }
@@ -151,16 +151,24 @@ int main() {
             settingsScreen.draw(window);
         }
         else if (currentGameState == GameState::PLAYING) {
-            GameRenderer::drawBoard(window, settings, boldFont);
+            GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);
             ui.draw(window);
         }
-        // Render Game BEHIND the Save/Load screen for overlay effect
-        else if (currentGameState == GameState::SAVE_MENU || currentGameState == GameState::LOAD_MENU) {
-            GameRenderer::drawBoard(window, settings, boldFont);
+        // Draw Overlays
+        else if (currentGameState == GameState::SAVE_MENU) {
+            GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);
-            // Draw the overlay on top
-            saveLoadScreen.draw(window);
+            saveScreen.draw(window, textureManager);
+        }
+        else if (currentGameState == GameState::LOAD_MENU) {
+            if (game.getCurrentPlayer() != Stone::Empty) {
+                GameRenderer::drawBoard(window, settings, font);
+                GameRenderer::drawStones(window, game, textureManager, settings);
+            } else {
+                mainMenu.draw(window);
+            }
+            loadScreen.draw(window, textureManager);
         }
 
         window.display();
