@@ -29,16 +29,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/LoadScreen.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/SaveScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SaveLoadScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SaveLoadScreen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/AudioManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/AudioManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GoUIManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MainMenuScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SaveScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,6 +116,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\assets\audio\BGM" />
+      <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\assets\audio\effects" />
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\include" />
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\src" />
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160" />
@@ -170,6 +171,10 @@
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/AudioManager.cpp</url>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/GoUIManager.cpp</url>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

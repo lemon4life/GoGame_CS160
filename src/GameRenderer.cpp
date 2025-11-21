@@ -113,7 +113,7 @@ namespace GameRenderer {
             window.draw(rightNumText);
 
             // ---------------- Letters (Columns) ----------------
-            char letterChar = 'A' + i;
+            char letterChar = 'A' + i + (i >= 8);
             // if (letterChar >= 'I') letterChar++; // Uncomment for standard Go skipping 'I'
 
             sf::Text charText(std::string(1, letterChar), font, 20);

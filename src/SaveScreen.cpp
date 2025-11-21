@@ -38,13 +38,19 @@ int SaveScreen::handleMouseClick(const sf::Vector2i& mousePos) {
 
     // Action Button (Save/Overwrite)
     if (m_showActionBtn && m_actionBtn.getGlobalBounds().contains(mx, my)) {
-        return m_selectedSlotId; 
-    }
+        for (const auto& slot : m_slots) {
+                std::remove(getFilePath(m_selectedSlotId).c_str());
+                refreshSlots();
+                if (m_selectedSlotId == slot.id) updatePreview(slot.id);
+                return m_selectedSlotId;
+            }
+            return -1;
+        }
 
     for (const auto& slot : m_slots) {
         // Delete
         if (!slot.isEmpty && slot.delBtn.getGlobalBounds().contains(mx, my)) {
-            std::remove(getFilePath(slot.id).c_str());
+            std::remove(getFilePath(m_selectedSlotId).c_str());
             refreshSlots();
             if (m_selectedSlotId == slot.id) updatePreview(slot.id);
             return -1;

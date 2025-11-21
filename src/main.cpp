@@ -103,6 +103,7 @@ int main() {
                     }
                     else if (action > 0) {
                         std::string filename = "saves/save_0" + std::to_string(action) + ".txt";
+                        currentGameState = GameState::PLAYING;
                         if (game.saveGame(filename)) {
                             ui.setNotification("Game Saved!");
                             saveScreen.refreshSlots();

@@ -100,10 +100,10 @@ void GoUIManager::draw(sf::RenderTarget& window) {
     window.draw(panel);
 
     if (game.getCurrentPlayer() == Stone::Black) {
-        turnIndicator.setString("Turn: BLACK");
+        turnIndicator.setString("Turn: White");
         turnIndicator.setFillColor(sf::Color::White);
     } else {
-        turnIndicator.setString("Turn: WHITE");
+        turnIndicator.setString("Turn: Black");
         turnIndicator.setFillColor(sf::Color::Cyan);
     }
     window.draw(turnIndicator);

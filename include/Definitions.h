@@ -1,6 +1,6 @@
-// include/Definitions.h
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <string>
 
 // --- Constants ---
 const int STONESNUM = 3;
@@ -20,8 +20,7 @@ const int BUTTON_START_X_GAME_UI = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING;
 const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
 
 // Enums
-
-enum class Stone { Empty, Black, White };
+enum class Stone { Empty, White, Black };
 enum class GameState { MENU, PLAYING, SETTINGS, EXIT, SAVE_MENU, LOAD_MENU };
 
 // Structs
@@ -32,16 +31,16 @@ struct Move {
 };
 
 struct GameSettings {
-    int boardThemeIndex = 0; // 0:Wood, 1:Blue, 2:Dark
-    int stoneStyleIndex = 0; // 0:Classic, 1:Modern, 2:Cartoon
+    int boardThemeIndex = 0; 
+    int stoneStyleIndex = 0; 
+    int bgmIndex = 0; // <--- NEW: Track selected music
     bool soundEnabled = true;
     bool musicEnabled = true;
     float volume = 50.0f;
 
     std::string getBoardImagePath() const {
-        // Make sure these files exist in your assets folder!
         if (boardThemeIndex == 1) return "assets/img/background/ocean.jpg";
         if (boardThemeIndex == 2) return "assets/img/background/galaxy.jpg";
-        return "assets/img/background/wood.jpg"; // Default (Index 0)
+        return "assets/img/background/wood.jpg"; 
     }
 };

@@ -38,9 +38,11 @@ bool GoGame::placeStone(int x, int y) {
     int engineX = x + 1;
     int engineY = y + 1;
 
+    bool captured;
+
     // 2. Delegate to Engine
     // make_move handles rules, captures, ko, and history
-    bool success = engine.make_move(engineX, engineY);
+    bool success = engine.make_move(engineX, engineY, captured);
 
     // 3. UI Feedback
     if (success) {
