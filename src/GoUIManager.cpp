@@ -30,7 +30,29 @@ void GoUIManager::initializeIndicators() {
 }
 
 void GoUIManager::initializeButtons() {
-    int y_pos = BUTTON_START_Y_GAME_UI + 40;
+    // --- NEW: Initialize Pass Button ---
+    // Position: Between Turn Indicator and Main Buttons (at BUTTON_START_Y_GAME_UI)
+    passButtonRect.setSize(sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT));
+    passButtonRect.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(BUTTON_START_Y_GAME_UI)));
+    passButtonRect.setFillColor(sf::Color(50, 100, 200)); // Blue Color
+    passButtonRect.setOutlineThickness(1);
+    passButtonRect.setOutlineColor(sf::Color::White);
+
+    passButtonText.setFont(font);
+    passButtonText.setString("PASS MOVE");
+    passButtonText.setCharacterSize(16);
+    passButtonText.setFillColor(sf::Color::White);
+
+    // Center Text
+    sf::FloatRect pbBounds = passButtonText.getLocalBounds();
+    passButtonText.setOrigin(pbBounds.width / 2.0f, pbBounds.height / 2.0f);
+    passButtonText.setPosition(
+        passButtonRect.getPosition().x + passButtonRect.getSize().x / 2.0f,
+        passButtonRect.getPosition().y + passButtonRect.getSize().y / 2.0f
+    );
+
+
+    int y_pos = BUTTON_START_Y_GAME_UI + 60;
     for (const auto& label : buttonLabels) {
         sf::RectangleShape rect;
         rect.setSize(sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT));
@@ -56,6 +78,19 @@ void GoUIManager::setNotification(const std::string& msg) {
 }
 
 bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWindow& window, GameState& currentGameState) {
+    // --- CHECK PASS BUTTON ---
+    sf::Vector2f mPos(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
+
+    if (passButtonRect.getGlobalBounds().contains(mPos)) {
+        bool gameOver = game.passTurn();
+        if (gameOver) {
+            currentGameState = GameState::GAME_OVER;
+        } else {
+            setNotification("Player Passed.");
+        }
+        return true;
+    }
+
     for (size_t i = 0; i < mainButtonRects.size(); ++i) {
         if (mainButtonRects[i].getGlobalBounds().contains(sf::Vector2f(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))) {
             std::string label = buttonLabels[i];
@@ -107,6 +142,9 @@ void GoUIManager::draw(sf::RenderTarget& window) {
         turnIndicator.setFillColor(sf::Color::Cyan);
     }
     window.draw(turnIndicator);
+
+    window.draw(passButtonRect);
+    window.draw(passButtonText);
 
     for (size_t i = 0; i < mainButtonRects.size(); ++i) {
         window.draw(mainButtonRects[i]);

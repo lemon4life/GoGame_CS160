@@ -22,6 +22,7 @@ public:
     // --- Actions ---
     // Returns true if move was valid
     bool placeStone(int x, int y);
+    bool passTurn();
 
     bool undo();
     bool redo(); // Note: Your engine needs to support redo, or we rely on engine's history
@@ -31,4 +32,8 @@ public:
     // --- Persistence ---
     bool saveGame(const std::string& filename);
     bool loadGame(const std::string& filename);
+
+    // --- NEW: Get Score Info ---
+    // Returns {Black Score, White Score}
+    std::pair<float, float> getScore();
 };

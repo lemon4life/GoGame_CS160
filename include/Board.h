@@ -66,6 +66,7 @@ public:
     // --- SCORING ---
     // Returns a pair: {BlackScore, WhiteScore}
     void deadStoneHeuristic();
+    vector< vector<bool> > getDeadState();
     void toggle_life_death(int x, int y);
     std::pair<float, float> calculateScore();
 

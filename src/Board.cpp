@@ -139,7 +139,7 @@ void GoEngine::initialize_board(int Size){
     boardSize = Size; cur_move = 0; currentPlayer = Player::WHITE;
     board.clear(); board.assign(Size+1, vector<Player>(Size+1, Player::NONE));
     zobristTable.clear(); zobristTable.assign(Size+1, vector<vector<uint64_t>>(Size+1, vector<uint64_t>(2, 0)));
-
+    dead = vector< vector<bool> >(boardSize+1, vector<bool>(boardSize+1, 0));
     superkoMap.clear();
     cur_hash = 0;
     history = {};
@@ -259,18 +259,21 @@ void GoEngine::deadStoneHeuristic(){
         influence = new_map;
     }
 
-    dead = vector< vector<bool> >(boardSize+1, vector<bool>(boardSize+1, 0));
+
     for(int i = 1; i <= boardSize; i++){
         for(int j = 1; j <= boardSize; j++) if((convert_numeral(board[i][j]) == 2 && influence[i][j] >= 0) || (convert_numeral(board[i][j]) == 1 && influence[i][j] <= 0)) dead[i][j] = 1;
     }
 }
 
+vector< vector<bool> > GoEngine::getDeadState() {
+    return dead;
+}
 void GoEngine::toggle_life_death(int x, int y){
     dead[x][y] = dead[x][y] ^ 1;
 }
 
 pair<float, float> GoEngine::calculateScore(){
-    clean_up_dead();
+    //clean_up_dead();
     vector< vector<bool> > checked(boardSize+1, vector<bool>(boardSize+1, 0));
     int Bpt = 0, Wpt = komi;
     for(int i = 1; i <= boardSize; i++){
@@ -281,18 +284,22 @@ pair<float, float> GoEngine::calculateScore(){
 
             while(!q.empty()){
                 auto [x, y] = q.front();
+                cout << x << " " << y << endl;
                 q.pop();
+                if (checked[x][y]) break;
                 checked[x][y] = 1;
                 cnt++;
 
                 for(int k = 0; k < 4; k++){
                     auto [xn, yn] = spread(x, y, k);
-                    if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize && !checked[xn][yn]){
+                    cout << xn << " " << yn << "    ";
+                    if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
                         if(board[xn][yn] == Player::BLACK) Badj = 1;
                         if(board[xn][yn] == Player::WHITE) Wadj = 1;
-                        if(board[xn][yn] == board[i][j]) q.push({xn, yn});
+                        if(checked[xn][yn] == 0 && board[xn][yn] == board[i][j]) q.push({xn, yn});
                     }
                 }
+                cout << endl;
             }
 
             if(board[i][j] == Player::BLACK) Bpt += cnt;

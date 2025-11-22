@@ -33,6 +33,14 @@ Stone GoGame::getStoneAt(int x, int y) const {
     return playerToStone(p);
 }
 
+// --- NEW PASS FUNCTION ---
+bool GoGame::passTurn() {
+    // Call engine pass logic
+    // engine.pass_move() returns true if Game Over (2 consecutive passes)
+    bool isGameOver = engine.pass_move();
+    return isGameOver;
+}
+
 bool GoGame::placeStone(int x, int y) {
     // 1. Convert UI Coordinates (0-based) to Engine Coordinates (1-based)
     int engineX = x + 1;
@@ -91,4 +99,9 @@ bool GoGame::saveGame(const std::string& filename) {
 bool GoGame::loadGame(const std::string& filename) {
     // The engine handles the file reading and board reconstruction
     return engine.loadGame(filename);
+}
+
+// --- NEW ---
+std::pair<float, float> GoGame::getScore() {
+    return engine.calculateScore();
 }

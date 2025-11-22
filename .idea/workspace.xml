@@ -29,11 +29,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/include/GameOverScreen.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/GameOverScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/AudioManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/AudioManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Board.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Board.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GoGame.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoGame.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GoUIManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoUIManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Board.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoUIManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

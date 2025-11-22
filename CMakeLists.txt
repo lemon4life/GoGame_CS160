@@ -59,6 +59,8 @@ add_executable(GoGame_CS160
         src/SaveLoadScreen.cpp
         src/SaveScreen.cpp
         src/LoadScreen.cpp
+        include/GameOverScreen.h
+        src/GameOverScreen.cpp
 )
 
 # 5. Link SFML to our executable

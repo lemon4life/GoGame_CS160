@@ -17,6 +17,10 @@ private:
     std::vector<sf::Text> mainButtonTexts;
     std::vector<std::string> buttonLabels;
 
+    // --- NEW: Pass Button ---
+    sf::RectangleShape passButtonRect;
+    sf::Text passButtonText;
+
     void initializeIndicators();
     void initializeButtons();
 

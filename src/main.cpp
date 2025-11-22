@@ -6,7 +6,8 @@
 #include "MainMenuScreen.h"
 #include "SettingsScreen.h"
 #include "GameRenderer.h"
-#include "SaveLoadScreen.h" // <--- Just this one header
+#include "SaveLoadScreen.h"
+#include "GameOverScreen.h"
 #include <cmath>
 
 void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& ui) {
@@ -39,14 +40,14 @@ int main() {
     // 3. Init Save & Load Screens
     SaveScreen saveScreen;
     LoadScreen loadScreen;
+    GameOverScreen gameOverScreen; // <--- NEW
 
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/arialbd.ttf")) {
-        // Handle Error
-    }
+    if (!font.loadFromFile("assets/fonts/arialbd.ttf")) { /* Handle error */ }
 
     saveScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "SAVE GAME");
     loadScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "LOAD GAME");
+    gameOverScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT); // <--- NEW
 
     GameState currentGameState = GameState::MENU;
     bool whilePlaying = false;
@@ -85,19 +86,52 @@ int main() {
                     }
 
                 }
-                // --- STATE: PLAYING ---
+
+                // --- PLAYING ---
                 else if (currentGameState == GameState::PLAYING) {
                     whilePlaying = true;
                     if (mousePos.x >= BOARD_MAX_WIDTH) {
-                        // Check Sidebar Clicks
                         GameState oldState = currentGameState;
                         ui.handleButtonClick(mousePos, window, currentGameState);
 
-                        if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
-                        if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
+                        // Check if UI switched us to GAME_OVER (via Pass button)
+                        if (currentGameState == GameState::GAME_OVER) {
+                            cerr << "send help";
+                            // Calculate Score immediately
+                            std::pair<float, float> scores = game.getScore();
+                            // float b = scores.first;
+                            // float w = scores.second;
+                            //
+                            // std::stringstream ss;
+                            // ss << "Black: " << std::fixed << std::setprecision(1) << b
+                            //    << "   White: " << w;
+                            //
+                            // std::string msg;
+                            // if (b > w) msg = "Black Wins!";
+                            // else if (w > b) msg = "White Wins!";
+                            // else msg = "Draw!";
+
+                            //gameOverScreen.setGameOverMessage(msg, ss.str());
+                        }
+                        else if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
+                        else if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
                     } else {
                         handleBoardClick(game, mousePos, ui);
                     }
+                }
+                // --- GAME OVER ---
+                else if (currentGameState == GameState::GAME_OVER) {
+                    cerr << "hi";
+                    // std::string action = gameOverScreen.handleMouseClick(mousePos);
+                    // if (action == "NEW") {
+                    //     game.resetGame();
+                    //     currentGameState = GameState::PLAYING;
+                    // } else if (action == "LOAD") {
+                    //     loadScreen.refreshSlots();
+                    //     currentGameState = GameState::LOAD_MENU;
+                    // } else if (action == "EXIT") {
+                    //     currentGameState = GameState::MENU;
+                    // }
                 }
                 // --- STATE: SAVE MENU ---
                 else if (currentGameState == GameState::SAVE_MENU) {
@@ -160,6 +194,14 @@ int main() {
             GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);
             ui.draw(window);
+        } else if (currentGameState == GameState::GAME_OVER) {
+            // Draw game in background
+            GameRenderer::drawBoard(window, settings, font);
+            GameRenderer::drawStones(window, game, textureManager, settings);
+            ui.draw(window); // Draw UI too so we see scores/panel
+
+            // Draw Popup
+            gameOverScreen.draw(window);
         }
         // Draw Overlays
         else if (currentGameState == GameState::SAVE_MENU) {
