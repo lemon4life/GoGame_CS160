@@ -42,5 +42,7 @@ public:
 
     // Get the grid of dead stones (true = dead, false = alive)
     // Returns 19x19 vector for UI rendering
-    std::vector<std::vector<bool>> getDeadStones() const;
+    std::vector<std::vector<bool>> getDeadStones();
+    void runHeuristic();
+
 };

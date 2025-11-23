@@ -273,7 +273,7 @@ void GoEngine::toggle_life_death(int x, int y){
 }
 
 pair<float, float> GoEngine::calculateScore(){
-    //clean_up_dead();
+    clean_up_dead();
     vector< vector<bool> > checked(boardSize+1, vector<bool>(boardSize+1, 0));
     float Bpt = 0, Wpt = komi;
     for(int i = 1; i <= boardSize; i++){

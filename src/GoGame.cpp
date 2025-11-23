@@ -113,7 +113,11 @@ void GoGame::toggleDeadStone(int x, int y) {
     engine.toggle_life_death(engineX, engineY);
 }
 
-std::vector<std::vector<bool>> GoGame::getDeadStones() const {
+void GoGame::runHeuristic() {
+    engine.deadStoneHeuristic();
+}
+
+std::vector<std::vector<bool>> GoGame::getDeadStones() {
     // Engine returns a grid sized [BOARD_SIZE+1][BOARD_SIZE+1]
     // We need to convert it to [BOARD_SIZE][BOARD_SIZE] for the UI
 
@@ -156,6 +160,8 @@ std::vector<std::vector<bool>> GoGame::getDeadStones() const {
     }
     return uiDead;
     */
+
+    return engine.getDeadState();
 
     // Placeholder until Board.h is updated
     return std::vector<std::vector<bool>>(BOARD_SIZE, std::vector<bool>(BOARD_SIZE, false));

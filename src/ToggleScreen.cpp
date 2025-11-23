@@ -42,7 +42,7 @@ void ToggleScreen::init(const sf::Font& font, float width, float height) {
     deadMarker.setFillColor(sf::Color(255, 0, 0, 180)); // Semi-transparent Red
 }
 
-void ToggleScreen::draw(sf::RenderWindow& window, const GoGame& game) {
+void ToggleScreen::draw(sf::RenderWindow& window, GoGame& game) {
     // 1. Draw UI Panel over old buttons
     window.draw(sidebarCover);
     window.draw(instructionText);
@@ -57,7 +57,8 @@ void ToggleScreen::draw(sf::RenderWindow& window, const GoGame& game) {
         for (int x = 0; x < BOARD_SIZE; ++x) {
             // Note: Ensure coordinate mapping matches your Board.cpp logic
             // If deadStones[x][y] is true, draw marker at grid(x, y)
-            if (deadStones[x][y]) {
+            if (deadStones[x + 1][y + 1]) {
+                //cout << x << ' ' << y << '\n';
                 // Convert Grid Index -> Screen Pixel
                 float screenX = GRID_OFFSET + x * CELL_SIZE;
                 float screenY = GRID_OFFSET + y * CELL_SIZE;

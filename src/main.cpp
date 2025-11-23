@@ -90,7 +90,7 @@ int main() {
                         if (currentGameState == GameState::GAME_OVER) {
                             // Pass button clicked 2x -> Go to Scoring
                             currentGameState = GameState::SCORING;
-                            // Run heuristic initially? game.runHeuristic();
+                            game.runHeuristic();
                         }
                         else if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
                         else if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
