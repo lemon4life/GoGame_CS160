@@ -84,6 +84,12 @@ void BaseSlotScreen::init(const sf::Font& font, float width, float height, const
     m_selectedSlotId = -1;
 }
 
+void BaseSlotScreen::reload() {
+    m_showPreview = false;
+    m_showActionBtn = false;
+    m_selectedSlotId = -1;
+}
+
 std::string BaseSlotScreen::getFilePath(int id) {
     return "saves/save_0" + std::to_string(id) + ".txt";
 }

@@ -54,6 +54,7 @@ int main() {
     toggleScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT); // <--- INIT
 
     GameState currentGameState = GameState::MENU;
+    bool whilePlaying = false;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -74,16 +75,19 @@ int main() {
                 // --- MENU ---
                 if (currentGameState == GameState::EXIT) { window.close(); }
                 if (currentGameState == GameState::MENU) {
+                    whilePlaying = false;
                     GameState newState = mainMenu.handleEvent(event, mousePos, game);
                     if (newState == GameState::LOAD_MENU) loadScreen.refreshSlots();
                     currentGameState = newState;
                 }
                 // --- SETTINGS ---
                 else if (currentGameState == GameState::SETTINGS) {
-                    currentGameState = settingsScreen.handleClick(mousePos);
+                    if (settingsScreen.handleClick(mousePos))
+                        currentGameState = (whilePlaying ? GameState::PLAYING : GameState::MENU);
                 }
                 // --- PLAYING ---
                 else if (currentGameState == GameState::PLAYING) {
+                    whilePlaying = true;
                     if (mousePos.x >= BOARD_MAX_WIDTH) {
                         ui.handleButtonClick(mousePos, window, currentGameState);
 
@@ -93,8 +97,15 @@ int main() {
                             currentGameState = GameState::SCORING;
                             // Run heuristic initially? game.runHeuristic();
                         }
-                        else if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
-                        else if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
+                        else if (currentGameState == GameState::SAVE_MENU) {
+                            saveScreen.reload();
+                            saveScreen.refreshSlots();
+                        }
+
+                        else if (currentGameState == GameState::LOAD_MENU) {
+                            loadScreen.reload();
+                            loadScreen.refreshSlots();
+                        }
                     } else {
                         handleBoardClick(game, mousePos, ui);
                     }
@@ -144,8 +155,11 @@ int main() {
                     else if (action > 0) {
                         if (game.saveGame("saves/save_0" + std::to_string(action) + ".txt")) {
                             ui.setNotification("Game Saved!");
+
                             saveScreen.refreshSlots();
                         }
+
+                        currentGameState = GameState::PLAYING;
                     }
                 }
                 else if (currentGameState == GameState::LOAD_MENU) {
@@ -163,6 +177,10 @@ int main() {
         }
 
         window.clear();
+
+        if (currentGameState == GameState::EXIT) {
+            window.close();
+        }
 
         // --- RENDER ---
         if (currentGameState == GameState::MENU) {
@@ -196,6 +214,7 @@ int main() {
         else if (currentGameState == GameState::SAVE_MENU) {
             GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);
+            saveScreen.refreshSlots();
             saveScreen.draw(window, textureManager);
         }
         else if (currentGameState == GameState::LOAD_MENU) {

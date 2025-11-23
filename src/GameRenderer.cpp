@@ -183,12 +183,20 @@ void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, cons
     // Assuming GoGame has: std  ::vector<std::vector<bool>> getValidMoves() const;
     auto validMoves = game.getValidMoves();
 
-        cerr << "Reset!\n";
-        cerr << "Reset!\n";
-        cerr << "Reset!\n";
-        cerr << "Reset!\n";
-        cerr << "Reset!\n";
-        cerr << "Reset!\n";
+        for (int i = 1; i <= BOARD_SIZE; ++i) {
+            for (int j = 1; j <= BOARD_SIZE; ++j) {
+                if (!validMoves[i][j]) {
+                    cout << i << ' ' << j << '\n';
+                }
+            }
+        }
+
+        // cerr << "Reset!\n";
+        // cerr << "Reset!\n";
+        // cerr << "Reset!\n";
+        // cerr << "Reset!\n";
+        // cerr << "Reset!\n";
+        // cerr << "Reset!\n";
 
     // Note: Engine uses 1-based indexing, vector might be size 20x20
     // Or if your validMoves() returns 0-based 19x19, adjust accordingly.
@@ -197,7 +205,7 @@ void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, cons
     if (validMoves[gx + 1][gy + 1]) {
         sf::Sprite ghostSprite;
 
-        cout << "valid\n";
+        // cout << "valid\n";
 
         // Determine current player to show correct color ghost
         Stone currentPlayer = game.getCurrentPlayer();

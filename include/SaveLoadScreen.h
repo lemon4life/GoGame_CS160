@@ -46,11 +46,14 @@ public:
     void draw(sf::RenderWindow& window, const StoneTextureManager& textureManager);
     void handleMouseMove(const sf::Vector2i& mousePos);
     virtual int handleMouseClick(const sf::Vector2i& mousePos) = 0;
+    void drawPreviewBoard(sf::RenderWindow& window, const StoneTextureManager& tm);
+    void updatePreview(int slotId);
+    void reload();
 
 protected:
     std::string getFilePath(int id);
-    void updatePreview(int slotId);
-    void drawPreviewBoard(sf::RenderWindow& window, const StoneTextureManager& tm);
+
+
     virtual void updateActionButtonState() = 0;
 };
 
