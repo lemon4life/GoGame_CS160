@@ -21,6 +21,7 @@ void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& u
     if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
         if (game.placeStone(gx, gy)) {
             ui.setNotification("Stone Placed");
+
         }
     }
 }
@@ -90,7 +91,7 @@ int main() {
                         if (currentGameState == GameState::GAME_OVER) {
                             // Pass button clicked 2x -> Go to Scoring
                             currentGameState = GameState::SCORING;
-                            game.runHeuristic();
+                            // Run heuristic initially? game.runHeuristic();
                         }
                         else if (currentGameState == GameState::SAVE_MENU) saveScreen.refreshSlots();
                         else if (currentGameState == GameState::LOAD_MENU) loadScreen.refreshSlots();
@@ -145,8 +146,6 @@ int main() {
                             ui.setNotification("Game Saved!");
                             saveScreen.refreshSlots();
                         }
-
-                        currentGameState = GameState::PLAYING;
                     }
                 }
                 else if (currentGameState == GameState::LOAD_MENU) {

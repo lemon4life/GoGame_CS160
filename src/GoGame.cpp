@@ -117,7 +117,7 @@ void GoGame::runHeuristic() {
     engine.deadStoneHeuristic();
 }
 
-std::vector<std::vector<bool>> GoGame::getDeadStones() {
+std::vector<std::vector<bool>> GoGame::getDeadStones() const {
     // Engine returns a grid sized [BOARD_SIZE+1][BOARD_SIZE+1]
     // We need to convert it to [BOARD_SIZE][BOARD_SIZE] for the UI
 
@@ -165,4 +165,11 @@ std::vector<std::vector<bool>> GoGame::getDeadStones() {
 
     // Placeholder until Board.h is updated
     return std::vector<std::vector<bool>>(BOARD_SIZE, std::vector<bool>(BOARD_SIZE, false));
+}
+
+std::vector<std::vector<bool>> GoGame::getValidMoves() const {
+    // The engine's validMoves() is not const in your snippet?
+    // If it modifies state temporarily, you might need to cast away const
+    // or make engine mutable, but assuming it's safe:
+    return const_cast<GoEngine&>(engine).validMoves();
 }

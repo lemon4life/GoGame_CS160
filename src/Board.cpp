@@ -185,11 +185,11 @@ bool GoEngine::pass_move(){
     return false;
 }
 
-vector< vector<bool> > GoEngine::validMoves() {
+vector< vector<bool> > GoEngine::validMoves()  {
     vector< vector<bool> > valid(boardSize+1, vector<bool>(boardSize+1, 0));
 
     for (int i = 1; i <= boardSize; i++) {
-        for (int j = 1; j <= boardSize; i++) {
+        for (int j = 1; j <= boardSize; j++) {
             if (board[i][j] != Player::NONE) {
                 valid[i][j] = 0;
             }
@@ -285,7 +285,7 @@ void GoEngine::deadStoneHeuristic(){
     }
 }
 
-vector< vector<bool> > GoEngine::getDeadState() {
+vector< vector<bool> > GoEngine::getDeadState() const  {
     return dead;
 }
 void GoEngine::toggle_life_death(int x, int y){

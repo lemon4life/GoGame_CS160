@@ -36,13 +36,14 @@ public:
     // --- NEW: Get Score Info ---
     // Returns {Black Score, White Score}
     std::pair<float, float> getScore();
+    std::vector<std::vector<bool>> getValidMoves() const;
 
     // Toggle life/death status of a stone at (x, y)
     void toggleDeadStone(int x, int y);
 
     // Get the grid of dead stones (true = dead, false = alive)
     // Returns 19x19 vector for UI rendering
-    std::vector<std::vector<bool>> getDeadStones();
+    std::vector<std::vector<bool>> getDeadStones() const;
     void runHeuristic();
 
 };

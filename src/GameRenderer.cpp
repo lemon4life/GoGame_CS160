@@ -14,7 +14,7 @@ namespace GameRenderer {
 
     // ... (Keep your toScreenCoord function here) ...
 
-    void drawBoard(sf::RenderTarget& window, const GameSettings& settings, const sf::Font& font) {
+    void drawBoard(sf::RenderWindow& window, const GameSettings& settings, const sf::Font& font) {
 
         // --- 1. Texture Caching Logic (The "Namespace" Fix) ---
         // 'static' means these variables persist between function calls!
@@ -145,7 +145,7 @@ namespace GameRenderer {
         }
     }
 }
-void GameRenderer::drawStones(sf::RenderTarget& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
+void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
     sf::Sprite stoneSprite;
 
     for (int y = 0; y < BOARD_SIZE; ++y) {
@@ -167,5 +167,58 @@ void GameRenderer::drawStones(sf::RenderTarget& window, const GoGame& game, cons
 
             window.draw(stoneSprite);
         }
+    }
+
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+    // Only draw if mouse is within the board area
+    if (mousePos.x < BOARD_MAX_WIDTH) {
+        int gx = std::round((mousePos.x - GRID_OFFSET) / CELL_SIZE);
+        int gy = std::round((mousePos.y - GRID_OFFSET) / CELL_SIZE);
+
+    // Check bounds
+    if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
+    // Get valid moves matrix from Engine
+    // You need to expose validMoves via GoGame first!
+    // Assuming GoGame has: std  ::vector<std::vector<bool>> getValidMoves() const;
+    auto validMoves = game.getValidMoves();
+
+        cerr << "Reset!\n";
+        cerr << "Reset!\n";
+        cerr << "Reset!\n";
+        cerr << "Reset!\n";
+        cerr << "Reset!\n";
+        cerr << "Reset!\n";
+
+    // Note: Engine uses 1-based indexing, vector might be size 20x20
+    // Or if your validMoves() returns 0-based 19x19, adjust accordingly.
+    // Based on your Board.cpp snippet, it returns size [boardSize+1][boardSize+1].
+
+    if (validMoves[gx + 1][gy + 1]) {
+        sf::Sprite ghostSprite;
+
+        cout << "valid\n";
+
+        // Determine current player to show correct color ghost
+        Stone currentPlayer = game.getCurrentPlayer();
+        if (currentPlayer == Stone::White) {
+            ghostSprite.setTexture(tm.getTexture(Stone::Black, settings.stoneStyleIndex));
+        } else {
+            ghostSprite.setTexture(tm.getTexture(Stone::White, settings.stoneStyleIndex));
+        }
+
+        // Set transparency (alpha = 128 is ~50%)
+        ghostSprite.setColor(sf::Color(255, 255, 255, 128));
+
+        sf::FloatRect bounds = ghostSprite.getLocalBounds();
+        ghostSprite.setOrigin(bounds.width / 2.0f, bounds.height / 2.0f);
+        ghostSprite.setPosition(toScreenCoord(gx, gy));
+
+        float scale = (CELL_SIZE * 0.95f) / bounds.width;
+        ghostSprite.setScale(scale, scale);
+
+        window.draw(ghostSprite);
+    }
+    }
     }
 }
