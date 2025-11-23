@@ -192,6 +192,7 @@ vector< vector<bool> > GoEngine::validMoves()  {
         for (int j = 1; j <= boardSize; j++) {
             if (board[i][j] != Player::NONE) {
                 valid[i][j] = 0;
+                continue;
             }
             switchPlayer();
             board[i][j] = currentPlayer;
