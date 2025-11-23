@@ -185,6 +185,24 @@ bool GoEngine::pass_move(){
     return false;
 }
 
+vector< vector<bool> > GoEngine::validMoves() {
+    vector< vector<bool> > valid(boardSize+1, vector<bool>(boardSize+1, 0));
+
+    for (int i = 1; i <= boardSize; i++) {
+        for (int j = 1; j <= boardSize; i++) {
+            if (board[i][j] != Player::NONE) {
+                valid[i][j] = 0;
+            }
+            switchPlayer();
+            board[i][j] = currentPlayer;
+            bool dc = 0;
+            valid[i][j] = reassest_board_state(i, j, dc);
+            switchPlayer();
+            board = history.board[cur_move];
+        }
+    }
+    return valid;
+}
 bool GoEngine::undo_step(){
     if(cur_move == 0) return false;
     cur_move--;
@@ -241,27 +259,29 @@ void GoEngine::deadStoneHeuristic(){
             }
         }
         influence = new_map;
+
     }
 
     for(int t = 0; t < 21; t++){
         vector< vector<int> > new_map = influence;
-        for(int i = 1; i <= boardSize; i++){
+        for(int i = 1; i <= boardSize; i++) {
             for(int j = 1; j <= boardSize; j++){
                 for(int k = 0; k < 4; k++){
                     auto [xn, yn] = spread(i, j, k);
                     if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
-                        if(influence[i][j] > 0 && influence[xn][yn] <= 0) new_map[i][j]--;
-                        if(influence[i][j] < 0 && influence[xn][yn] >= 0) new_map[i][j]++;
+                        if(influence[i][j] > 0 && influence[xn][yn] <= 0 && new_map[i][j] > 0) new_map[i][j]--;
+                        else if(influence[i][j] < 0 && influence[xn][yn] >= 0 && new_map[i][j] < 0) new_map[i][j]++;
                     }
                 }
             }
         }
         influence = new_map;
+
     }
 
 
     for(int i = 1; i <= boardSize; i++){
-        for(int j = 1; j <= boardSize; j++) if((convert_numeral(board[i][j]) == 2 && influence[i][j] >= 0) || (convert_numeral(board[i][j]) == 1 && influence[i][j] <= 0)) dead[i][j] = 1;
+        for(int j = 1; j <= boardSize; j++) if((convert_numeral(board[i][j]) == 2 && influence[i][j] < 0) || (convert_numeral(board[i][j]) == 1 && influence[i][j] > 0)) dead[i][j] = 1;
     }
 }
 
@@ -284,14 +304,14 @@ pair<float, float> GoEngine::calculateScore(){
 
             while(!q.empty()){
                 auto [x, y] = q.front();
-                cout << x << " " << y << endl;
+                //cout << x << " " << y << endl;
                 q.pop();
                 checked[x][y] = 1;
                 cnt++;
 
                 for(int k = 0; k < 4; k++){
                     auto [xn, yn] = spread(x, y, k);
-                    cout << xn << " " << yn << "    ";
+                    //cout << xn << " " << yn << "    ";
                     if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
                         if(board[xn][yn] == Player::BLACK) Badj = 1;
                         if(board[xn][yn] == Player::WHITE) Wadj = 1;
@@ -301,7 +321,7 @@ pair<float, float> GoEngine::calculateScore(){
                         }
                     }
                 }
-                cout << endl;
+                //cout << endl;
             }
 
             if(board[i][j] == Player::BLACK) Bpt += cnt;
@@ -313,7 +333,7 @@ pair<float, float> GoEngine::calculateScore(){
             }
         }
     }
-    cout << komi << endl;
+    //cout << komi << endl;
     return {Bpt, Wpt};
 }
 
@@ -350,7 +370,8 @@ bool GoEngine::loadGame(const string& filepath){
         int x = 0, y = 0;
         infile >> x >> y;
         bool dc = 0;
-        make_move(x, y, dc);
+        if (x == -1) pass_move();
+        else make_move(x, y, dc);
     }
     infile.close();
     return true;

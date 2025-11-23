@@ -51,7 +51,7 @@ public:
     // Returns true if the move was valid and successful
     bool make_move(int x, int y, bool& didCaptured);
     bool pass_move();
-
+    vector<vector<bool>> validMoves();
     //Undo/Redo by one move
     //Doesn't handle overflow/underflow states
     bool undo_step();
