@@ -105,3 +105,58 @@ bool GoGame::loadGame(const std::string& filename) {
 std::pair<float, float> GoGame::getScore() {
     return engine.calculateScore();
 }
+
+void GoGame::toggleDeadStone(int x, int y) {
+    // Map UI (0-18) to Engine (1-19)
+    int engineX = x + 1;
+    int engineY = y + 1;
+    engine.toggle_life_death(engineX, engineY);
+}
+
+std::vector<std::vector<bool>> GoGame::getDeadStones() const {
+    // Engine returns a grid sized [BOARD_SIZE+1][BOARD_SIZE+1]
+    // We need to convert it to [BOARD_SIZE][BOARD_SIZE] for the UI
+
+    // We can't access 'dead' directly if it's private, so we need a getter in GoEngine.
+    // Assuming you added `getDeadState()` to GoEngine as per your prompt.
+
+    // Note: `getDeadState` returns vector<vector<bool>>
+    // We need to cast or just call it. Since 'dead' is private in Board.h,
+    // we assume you added the public getter `getDeadState()` there.
+
+    // If GoEngine doesn't have a public getter yet, you must add it to Board.h!
+    // But assuming it exists:
+    // auto rawDead = engine.getDeadState();
+
+    // Wait, 'getDeadState' isn't in the Board.h you showed earlier,
+    // but you provided the code for it in the prompt.
+    // I will assume you added it to Board.h.
+
+    // Since I cannot see `getDeadState` in `Board.h` public section,
+    // I will create a dummy return here.
+    // YOU MUST ADD `vector<vector<bool>> getDeadState();` to `Board.h` public section.
+
+    // ... Let's assume it's there ...
+    // auto rawDead = engine.getDeadState();
+
+    // Since I cannot modify Board.h/cpp, I cannot implement this fully without that getter.
+    // However, assuming you added it:
+
+    /*
+    std::vector<std::vector<bool>> uiDead(BOARD_SIZE, std::vector<bool>(BOARD_SIZE, false));
+    auto rawDead = engine.getDeadState(); // Assumes 1-based indexing from engine
+
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        for (int j = 0; j < BOARD_SIZE; ++j) {
+            // Safety check
+            if (i + 1 < rawDead.size() && j + 1 < rawDead[i+1].size()) {
+                uiDead[j][i] = rawDead[i + 1][j + 1]; // Notice X/Y swap if needed based on your loop
+            }
+        }
+    }
+    return uiDead;
+    */
+
+    // Placeholder until Board.h is updated
+    return std::vector<std::vector<bool>>(BOARD_SIZE, std::vector<bool>(BOARD_SIZE, false));
+}

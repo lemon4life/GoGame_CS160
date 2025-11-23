@@ -119,11 +119,11 @@ void SettingsScreen::draw(sf::RenderWindow& window) {
     window.draw(backButtonText);
 }
 
-bool SettingsScreen::handleClick(const sf::Vector2i& mousePos) {
+GameState SettingsScreen::handleClick(const sf::Vector2i& mousePos) {
     sf::Vector2f pos(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
 
     if (backButtonRect.getGlobalBounds().contains(pos)) {
-        return true;
+        return GameState::PLAYING;
     }
 
     for (auto& btn : buttons) {
@@ -153,5 +153,5 @@ bool SettingsScreen::handleClick(const sf::Vector2i& mousePos) {
             }
         }
     }
-    return false;
+    return GameState::SETTINGS;
 }

@@ -275,7 +275,7 @@ void GoEngine::toggle_life_death(int x, int y){
 pair<float, float> GoEngine::calculateScore(){
     //clean_up_dead();
     vector< vector<bool> > checked(boardSize+1, vector<bool>(boardSize+1, 0));
-    int Bpt = 0, Wpt = komi;
+    float Bpt = 0, Wpt = komi;
     for(int i = 1; i <= boardSize; i++){
         for(int j = 1; j <= boardSize; j++) if(checked[i][j] == 0){
             int cnt = 0; bool Badj = 0, Wadj = 0;
@@ -286,7 +286,6 @@ pair<float, float> GoEngine::calculateScore(){
                 auto [x, y] = q.front();
                 cout << x << " " << y << endl;
                 q.pop();
-                if (checked[x][y]) break;
                 checked[x][y] = 1;
                 cnt++;
 
@@ -296,7 +295,10 @@ pair<float, float> GoEngine::calculateScore(){
                     if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
                         if(board[xn][yn] == Player::BLACK) Badj = 1;
                         if(board[xn][yn] == Player::WHITE) Wadj = 1;
-                        if(checked[xn][yn] == 0 && board[xn][yn] == board[i][j]) q.push({xn, yn});
+                        if(checked[xn][yn] == 0 && board[xn][yn] == board[i][j]) {
+                            checked[xn][yn] = 1;
+                            q.push({xn, yn});
+                        }
                     }
                 }
                 cout << endl;
@@ -311,6 +313,7 @@ pair<float, float> GoEngine::calculateScore(){
             }
         }
     }
+    cout << komi << endl;
     return {Bpt, Wpt};
 }
 

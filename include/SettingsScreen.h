@@ -34,5 +34,5 @@ public:
     SettingsScreen(GameSettings& s, StoneTextureManager& tm, AudioManager& am);
 
     void draw(sf::RenderWindow& window);
-    bool handleClick(const sf::Vector2i& mousePos);
+    GameState handleClick(const sf::Vector2i& mousePos);
 };
