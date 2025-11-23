@@ -145,6 +145,8 @@ int main() {
                             ui.setNotification("Game Saved!");
                             saveScreen.refreshSlots();
                         }
+
+                        currentGameState = GameState::PLAYING;
                     }
                 }
                 else if (currentGameState == GameState::LOAD_MENU) {
