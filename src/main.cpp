@@ -8,7 +8,7 @@
 #include "GameRenderer.h"
 #include "SaveLoadScreen.h"
 #include "GameOverScreen.h"
-#include "ToggleScreen.h" // <--- NEW HEADER
+#include "ToggleScreen.h"
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -19,9 +19,16 @@ void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& u
     int gy = std::round((mousePos.y - GRID_OFFSET) / CELL_SIZE);
 
     if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
-        if (game.placeStone(gx, gy)) {
+        int action = game.placeStone(gx, gy);
+        if (action == 1) {
             ui.setNotification("Stone Placed");
-
+        } else if (action == -1) {
+            if (game.getCurrentPlayer() == Stone::Black)
+                ui.setNotification("Black captured!");
+            else
+                ui.setNotification(("White captured!"));
+        } else {
+            ui.setNotification(("Illegal move!"));
         }
     }
 }
@@ -43,15 +50,17 @@ int main() {
     SaveScreen saveScreen;
     LoadScreen loadScreen;
     GameOverScreen gameOverScreen;
-    ToggleScreen toggleScreen; // <--- NEW OBJECT
+    ToggleScreen toggleScreen;
 
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/arialbd.ttf")) { /* Error */ }
+    if (!font.loadFromFile("assets/fonts/arialbd.ttf")) {
+        cerr << "Error Loading Fonts!";
+    }
 
     saveScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "SAVE GAME");
     loadScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT, "LOAD GAME");
     gameOverScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT);
-    toggleScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT); // <--- INIT
+    toggleScreen.init(font, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     GameState currentGameState = GameState::MENU;
     bool whilePlaying = false;
@@ -151,7 +160,7 @@ int main() {
                 // --- SAVE/LOAD ---
                 else if (currentGameState == GameState::SAVE_MENU) {
                     int action = saveScreen.handleMouseClick(mousePos);
-                    if (action == -2) currentGameState = GameState::PLAYING;
+                    if (action == -2) currentGameState = whilePlaying ? GameState::PLAYING : GameState::MENU;
                     else if (action > 0) {
                         if (game.saveGame("saves/save_0" + std::to_string(action) + ".txt")) {
                             ui.setNotification("Game Saved!");
@@ -165,7 +174,7 @@ int main() {
                 else if (currentGameState == GameState::LOAD_MENU) {
                     int action = loadScreen.handleMouseClick(mousePos);
                     if (action == -2) {
-                        currentGameState = (game.getCurrentPlayer() == Stone::Empty) ? GameState::MENU : GameState::PLAYING;
+                        if (action == -2) currentGameState = whilePlaying ? GameState::PLAYING : GameState::MENU;
                     } else if (action > 0) {
                         if (game.loadGame("saves/save_0" + std::to_string(action) + ".txt")) {
                             ui.setNotification("Game Loaded!");

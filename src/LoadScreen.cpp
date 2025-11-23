@@ -1,8 +1,6 @@
 #include "SaveLoadScreen.h"
 #include <cstdio>
 
-// --- LOAD SCREEN IMPLEMENTATION ---
-
 void LoadScreen::updateActionButtonState() {
     if (m_selectedSlotId == -1) {
         m_showActionBtn = false;

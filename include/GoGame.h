@@ -7,7 +7,6 @@
 
 class GoGame {
 private:
-    // The "Brain" of the game
     GoEngine engine;
 
     AudioManager& audio;
@@ -21,11 +20,11 @@ public:
 
     // --- Actions ---
     // Returns true if move was valid
-    bool placeStone(int x, int y);
+    int placeStone(int x, int y);
     bool passTurn();
 
     bool undo();
-    bool redo(); // Note: Your engine needs to support redo, or we rely on engine's history
+    bool redo();
 
     void resetGame();
 

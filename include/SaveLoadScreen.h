@@ -44,7 +44,6 @@ public:
     void init(const sf::Font& font, float width, float height, const std::string& title);
     void refreshSlots();
     void draw(sf::RenderWindow& window, const StoneTextureManager& textureManager);
-    void handleMouseMove(const sf::Vector2i& mousePos);
     virtual int handleMouseClick(const sf::Vector2i& mousePos) = 0;
     void drawPreviewBoard(sf::RenderWindow& window, const StoneTextureManager& tm);
     void updatePreview(int slotId);

@@ -213,7 +213,3 @@ void BaseSlotScreen::draw(sf::RenderWindow& window, const StoneTextureManager& t
         }
     }
 }
-
-void BaseSlotScreen::handleMouseMove(const sf::Vector2i& mousePos) {
-    // Optional hover logic
-}

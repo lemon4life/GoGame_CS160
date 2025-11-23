@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Enum for readability
 enum class Player { NONE, WHITE, BLACK };
 
 class GoEngine {

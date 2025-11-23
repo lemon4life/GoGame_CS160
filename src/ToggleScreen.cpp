@@ -55,11 +55,7 @@ void ToggleScreen::draw(sf::RenderWindow& window, GoGame& game) {
 
     for (int y = 0; y < BOARD_SIZE; ++y) {
         for (int x = 0; x < BOARD_SIZE; ++x) {
-            // Note: Ensure coordinate mapping matches your Board.cpp logic
-            // If deadStones[x][y] is true, draw marker at grid(x, y)
             if (deadStones[x + 1][y + 1]) {
-                //cout << x << ' ' << y << '\n';
-                // Convert Grid Index -> Screen Pixel
                 float screenX = GRID_OFFSET + x * CELL_SIZE;
                 float screenY = GRID_OFFSET + y * CELL_SIZE;
                 
@@ -85,8 +81,6 @@ bool ToggleScreen::handleClick(const sf::Vector2i& mousePos, GoGame& game) {
         int gy = std::round((my - GRID_OFFSET) / CELL_SIZE);
 
         if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
-            // Only toggle if there is actually a stone there? 
-            // Usually engine handles that check, but safe to call anyway.
             if (game.getStoneAt(gx, gy) != Stone::Empty) {
                 game.toggleDeadStone(gx, gy);
             }

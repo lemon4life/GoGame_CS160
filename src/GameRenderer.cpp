@@ -1,23 +1,15 @@
-// src/GameRenderer.cpp
 #include "GameRenderer.h"
+#include <iostream> // For error logging
 #include <cmath>
 #include <string>
 
-sf::Vector2f GameRenderer::toScreenCoord(int x, int y) {
-    return sf::Vector2f(GRID_OFFSET + x * CELL_SIZE, GRID_OFFSET + y * CELL_SIZE);
-}
-
-#include "GameRenderer.h"
-#include <iostream> // For error logging
-
 namespace GameRenderer {
-
-    // ... (Keep your toScreenCoord function here) ...
+    sf::Vector2f toScreenCoord(int x, int y) {
+        return sf::Vector2f(GRID_OFFSET + x * CELL_SIZE, GRID_OFFSET + y * CELL_SIZE);
+    }
 
     void drawBoard(sf::RenderWindow& window, const GameSettings& settings, const sf::Font& font) {
-
         // --- 1. Texture Caching Logic (The "Namespace" Fix) ---
-        // 'static' means these variables persist between function calls!
         static sf::Texture boardTexture;
         static int lastThemeIndex = -1;
 
@@ -145,6 +137,7 @@ namespace GameRenderer {
         }
     }
 }
+
 void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
     sf::Sprite stoneSprite;
 
@@ -153,7 +146,6 @@ void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, cons
             Stone s = game.getStoneAt(x, y);
             if (s == Stone::Empty) continue;
 
-            // --- FIX 2: Use 'tm' (the variable) and pass 'settings.stoneStyleIndex' ---
             const sf::Texture& texture = tm.getTexture(s, settings.stoneStyleIndex);
 
             stoneSprite.setTexture(texture);
@@ -176,57 +168,32 @@ void GameRenderer::drawStones(sf::RenderWindow& window, const GoGame& game, cons
         int gx = std::round((mousePos.x - GRID_OFFSET) / CELL_SIZE);
         int gy = std::round((mousePos.y - GRID_OFFSET) / CELL_SIZE);
 
-    // Check bounds
-    if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
-    // Get valid moves matrix from Engine
-    // You need to expose validMoves via GoGame first!
-    // Assuming GoGame has: std  ::vector<std::vector<bool>> getValidMoves() const;
-    auto validMoves = game.getValidMoves();
+        if (gx >= 0 && gx < BOARD_SIZE && gy >= 0 && gy < BOARD_SIZE) {
+            auto validMoves = game.getValidMoves();
 
-        for (int i = 1; i <= BOARD_SIZE; ++i) {
-            for (int j = 1; j <= BOARD_SIZE; ++j) {
-                if (!validMoves[i][j]) {
-                    cout << i << ' ' << j << '\n';
+            if (validMoves[gx + 1][gy + 1]) {
+                sf::Sprite ghostSprite;
+
+                // Determine current player to show correct color ghost
+                Stone currentPlayer = game.getCurrentPlayer();
+                if (currentPlayer == Stone::White) {
+                    ghostSprite.setTexture(tm.getTexture(Stone::Black, settings.stoneStyleIndex));
+                } else {
+                    ghostSprite.setTexture(tm.getTexture(Stone::White, settings.stoneStyleIndex));
                 }
+
+                // Set transparency (alpha = 128 is ~50%)
+                ghostSprite.setColor(sf::Color(255, 255, 255, 128));
+
+                sf::FloatRect bounds = ghostSprite.getLocalBounds();
+                ghostSprite.setOrigin(bounds.width / 2.0f, bounds.height / 2.0f);
+                ghostSprite.setPosition(toScreenCoord(gx, gy));
+
+                float scale = (CELL_SIZE * 0.95f) / bounds.width;
+                ghostSprite.setScale(scale, scale);
+
+                window.draw(ghostSprite);
             }
         }
-
-        // cerr << "Reset!\n";
-        // cerr << "Reset!\n";
-        // cerr << "Reset!\n";
-        // cerr << "Reset!\n";
-        // cerr << "Reset!\n";
-        // cerr << "Reset!\n";
-
-    // Note: Engine uses 1-based indexing, vector might be size 20x20
-    // Or if your validMoves() returns 0-based 19x19, adjust accordingly.
-    // Based on your Board.cpp snippet, it returns size [boardSize+1][boardSize+1].
-
-    if (validMoves[gx + 1][gy + 1]) {
-        sf::Sprite ghostSprite;
-
-        // cout << "valid\n";
-
-        // Determine current player to show correct color ghost
-        Stone currentPlayer = game.getCurrentPlayer();
-        if (currentPlayer == Stone::White) {
-            ghostSprite.setTexture(tm.getTexture(Stone::Black, settings.stoneStyleIndex));
-        } else {
-            ghostSprite.setTexture(tm.getTexture(Stone::White, settings.stoneStyleIndex));
-        }
-
-        // Set transparency (alpha = 128 is ~50%)
-        ghostSprite.setColor(sf::Color(255, 255, 255, 128));
-
-        sf::FloatRect bounds = ghostSprite.getLocalBounds();
-        ghostSprite.setOrigin(bounds.width / 2.0f, bounds.height / 2.0f);
-        ghostSprite.setPosition(toScreenCoord(gx, gy));
-
-        float scale = (CELL_SIZE * 0.95f) / bounds.width;
-        ghostSprite.setScale(scale, scale);
-
-        window.draw(ghostSprite);
-    }
-    }
     }
 }

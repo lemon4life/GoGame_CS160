@@ -50,7 +50,7 @@ int SaveScreen::handleMouseClick(const sf::Vector2i& mousePos) {
     for (const auto& slot : m_slots) {
         // Delete
         if (!slot.isEmpty && slot.delBtn.getGlobalBounds().contains(mx, my)) {
-            std::remove(getFilePath(m_selectedSlotId).c_str());
+            std::remove(getFilePath(slot.id).c_str());
             refreshSlots();
             if (m_selectedSlotId == slot.id) updatePreview(slot.id);
             return -1;
