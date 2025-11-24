@@ -204,7 +204,7 @@ int main() {
             window.close();
         }
 
-        // --- RENDER ---
+        // --- RENDER SCREENS ---
         if (currentGameState == GameState::MENU) {
             mainMenu.draw(window);
         }
@@ -227,6 +227,8 @@ int main() {
         //     // Draw Toggle Screen on top (Finish button + Dead markers)
         //     toggleScreen.draw(window, game);
         // }
+
+        //Show Game Over Menu - Save Menu - Load Menu
         else if (currentGameState == GameState::GAME_OVER) {
             GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);

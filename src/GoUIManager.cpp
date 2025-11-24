@@ -120,6 +120,7 @@ bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWind
                 currentGameState = GameState::SETTINGS;
             }
             else {
+                //wait for Zobrist
                 setNotification("Feature not implemented.");
             }
             return true;
@@ -128,6 +129,7 @@ bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWind
     return false;
 }
 
+//Render
 void GoUIManager::draw(sf::RenderTarget& window) {
     sf::RectangleShape panel(sf::Vector2f(PANEL_WIDTH, WINDOW_HEIGHT));
     panel.setPosition(sf::Vector2f(static_cast<float>(WINDOW_WIDTH - PANEL_WIDTH), 0.0f));

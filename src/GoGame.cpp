@@ -14,10 +14,12 @@ GoGame::GoGame(AudioManager& am) : audio(am) {
     engine.initialize_board(BOARD_SIZE);
 }
 
+//Check for current player
 Stone GoGame::getCurrentPlayer() const {
     return playerToStone(engine.getCurrentPlayer());
 }
 
+//Check for stone in intersection
 Stone GoGame::getStoneAt(int x, int y) const {
     // 1. Check Bounds (UI uses 0-18)
     if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE)
@@ -32,11 +34,13 @@ Stone GoGame::getStoneAt(int x, int y) const {
     return playerToStone(p);
 }
 
+//Pass the turn
 bool GoGame::passTurn() {
     bool isGameOver = engine.pass_move();
     return isGameOver;
 }
 
+//Play the move
 int GoGame::placeStone(int x, int y) {
     // 1. Convert UI Coordinates (0-based) to Engine Coordinates (1-based)
     int engineX = x + 1;
@@ -103,6 +107,7 @@ void GoGame::toggleDeadStone(int x, int y) {
     engine.toggle_life_death(engineX, engineY);
 }
 
+//Zobrist's Algorithm
 void GoGame::runHeuristic() {
     engine.deadStoneHeuristic();
 }
