@@ -73,8 +73,6 @@ int main() {
             // --- MOUSE MOVE ---
             if (event.type == sf::Event::MouseMoved) {
                 sf::Vector2i mPos(event.mouseMove.x, event.mouseMove.y);
-                if (currentGameState == GameState::SAVE_MENU) saveScreen.handleMouseMove(mPos);
-                else if (currentGameState == GameState::LOAD_MENU) loadScreen.handleMouseMove(mPos);
             }
 
             // --- MOUSE CLICK ---
@@ -102,11 +100,35 @@ int main() {
 
                         // Transition Logic
                         if (currentGameState == GameState::GAME_OVER) {
-                            // Pass button clicked 2x -> Go to Scoring
-                            currentGameState = GameState::SCORING;
-                            // Run heuristic initially? game.runHeuristic();
+                            // Calculate Final Score
+                            auto scores = game.getScore();
+                            float bScore = scores.first;
+                            float wScore = scores.second;
+
+                            std::stringstream ss;
+                            ss << std::fixed << std::setprecision(1)
+                               << "Black: " << bScore << "   White: " << wScore;
+
+                            std::string msg;
+                            if (bScore > wScore) msg = "Black Wins!";
+                            else if (wScore > bScore) msg = "White Wins!";
+                            else msg = "Draw!";
+
+                            gameOverScreen.setGameOverMessage(msg, ss.str());
+
+                            std::string action = gameOverScreen.handleMouseClick(mousePos);
+                            if (action == "NEW") {
+                                game.resetGame();
+                                currentGameState = GameState::PLAYING;
+                            } else if (action == "LOAD") {
+                                loadScreen.refreshSlots();
+                                currentGameState = GameState::LOAD_MENU;
+                            } else if (action == "EXIT") {
+                                currentGameState = GameState::MENU;
+                            }
                         }
-                        else if (currentGameState == GameState::SAVE_MENU) {
+                         if (currentGameState == GameState::SAVE_MENU) {
+
                             saveScreen.reload();
                             saveScreen.refreshSlots();
                         }
@@ -120,13 +142,7 @@ int main() {
                     }
                 }
                 // --- SCORING (Toggle Dead Stones) ---
-                else if (currentGameState == GameState::SCORING) {
-                    // Delegate to ToggleScreen
-                    bool finished = toggleScreen.handleClick(mousePos, game);
-
-                    if (finished) {
-                        currentGameState = GameState::GAME_OVER; // Go to Popup
-
+                else if (currentGameState == GameState::GAME_OVER) {
                         // Calculate Final Score
                         auto scores = game.getScore();
                         float bScore = scores.first;
@@ -142,10 +158,7 @@ int main() {
                         else msg = "Draw!";
 
                         gameOverScreen.setGameOverMessage(msg, ss.str());
-                    }
-                }
-                // --- GAME OVER POPUP ---
-                else if (currentGameState == GameState::GAME_OVER) {
+
                     std::string action = gameOverScreen.handleMouseClick(mousePos);
                     if (action == "NEW") {
                         game.resetGame();
@@ -203,17 +216,17 @@ int main() {
             GameRenderer::drawStones(window, game, textureManager, settings);
             ui.draw(window);
         }
-        else if (currentGameState == GameState::SCORING) {
-            // Draw Board (Normal stones, NO markers from renderer)
-            GameRenderer::drawBoard(window, settings, font);
-            GameRenderer::drawStones(window, game, textureManager, settings);
-
-            // Draw UI (Side panel hides old buttons)
-            ui.draw(window); // Draw base sidebar
-
-            // Draw Toggle Screen on top (Finish button + Dead markers)
-            toggleScreen.draw(window, game);
-        }
+        // else if (currentGameState == GameState::SCORING) {
+        //     // Draw Board (Normal stones, NO markers from renderer)
+        //     GameRenderer::drawBoard(window, settings, font);
+        //     GameRenderer::drawStones(window, game, textureManager, settings);
+        //
+        //     // Draw UI (Side panel hides old buttons)
+        //     ui.draw(window); // Draw base sidebar
+        //
+        //     // Draw Toggle Screen on top (Finish button + Dead markers)
+        //     toggleScreen.draw(window, game);
+        // }
         else if (currentGameState == GameState::GAME_OVER) {
             GameRenderer::drawBoard(window, settings, font);
             GameRenderer::drawStones(window, game, textureManager, settings);

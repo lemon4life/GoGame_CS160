@@ -49,6 +49,7 @@ public:
     void updatePreview(int slotId);
     void reload();
 
+
 protected:
     std::string getFilePath(int id);
 
