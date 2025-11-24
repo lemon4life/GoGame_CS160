@@ -30,7 +30,17 @@
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Report.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Report.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/audio/BGM/Judgment_of_Euthymia.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/assets/audio/BGM/Judgment_of_Euthymia.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/audio/BGM/The_Listener.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/assets/audio/BGM/The_Listener.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/audio/BGM/bgm.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/ARIALN.TTF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/ARIALNBI.TTF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/ARIALNI.TTF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/arialbi.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/ariali.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/ariblk.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AudioManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/AudioManager.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,6 +132,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -134,7 +149,8 @@
       <workItem from="1763512751477" duration="74000" />
       <workItem from="1763528343004" duration="21497000" />
       <workItem from="1763961050898" duration="3558000" />
-      <workItem from="1763989859333" duration="523000" />
+      <workItem from="1763989859333" duration="923000" />
+      <workItem from="1763991780958" duration="1137000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />

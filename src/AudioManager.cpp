@@ -18,13 +18,11 @@ AudioManager::AudioManager(GameSettings& s) : settings(s) {
     bgmFiles = {
         "assets/audio/BGM/Judgment_of_Euthymia.mp3",
         "assets/audio/BGM/The_Listener.mp3",
-        "assets/audio/BGM/bgm.mp3"
     };
 
     bgmNames = {
         "Judgment of Euthymia",
         "The Listener",
-        "Yi Jian Mei"
     };
 
     //Start Initial BGM
