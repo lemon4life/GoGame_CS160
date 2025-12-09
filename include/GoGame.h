@@ -11,6 +11,8 @@ private:
 
     AudioManager& audio;
 
+    string convertToGTP(int x, int y);
+    void convertFromGTP(std::string gtp, int &x, int &y);
 public:
     GoGame(AudioManager& am);
 
@@ -45,4 +47,9 @@ public:
     std::vector<std::vector<bool>> getDeadStones() const;
     void runHeuristic();
 
+    KataGoRunner bot;
+    void initAI();
+
+    void handleHumanMove(int x, int y, Player side);
+    void doAITurn(Player side, int &x, int &y);
 };
