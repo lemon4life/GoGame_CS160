@@ -1,11 +1,12 @@
-#include "SaveLoadScreen.h"
+#include "../include/SaveLoadScreen.h"
 #include <filesystem>
 #include <cstdio>
 #include <iostream>
 
 namespace fs = std::filesystem;
 
-const float PREVIEW_X = 600.0f;
+// Layout Constants
+const float PREVIEW_X = 650.0f;
 const float PREVIEW_Y = 150.0f;
 const float PREVIEW_SIZE = 350.0f;
 const float SLOT_START_Y = 150.0f;
@@ -13,75 +14,68 @@ const float SLOT_START_Y = 150.0f;
 // --- BASE CLASS IMPLEMENTATION ---
 
 void BaseSlotScreen::init(const sf::Font& font, float width, float height, const std::string& title) {
-    // 1. Setup UI Elements
+    // 1. Background
     m_background.setSize(sf::Vector2f(width, height));
-    m_background.setFillColor(sf::Color(30, 30, 30, 240));
+    m_background.setFillColor(sf::Color(20, 20, 20, 240)); // Slightly darker
 
+    // 2. Title
     m_titleText.setFont(font);
-    m_titleText.setCharacterSize(50);
-    m_titleText.setFillColor(sf::Color(220, 220, 220));
+    m_titleText.setCharacterSize(40);
+    m_titleText.setFillColor(Theme::TextNormal);
     m_titleText.setPosition(80, 50);
     m_titleText.setString(title);
 
-    m_backButton.setSize(sf::Vector2f(100, 40));
-    m_backButton.setFillColor(sf::Color(100, 150, 100));
-    m_backButton.setPosition(width - 150, 60);
+    // 3. Back Button (Using Button Class)
+    m_backButton = std::make_unique<Theme::Button>(
+        font, "BACK", sf::Vector2f(120, 40),
+        sf::Vector2f(width - 100, 70), Theme::BtnDanger
+    );
 
-    m_backButtonText.setFont(font);
-    m_backButtonText.setString("Back");
-    m_backButtonText.setCharacterSize(20);
-    m_backButtonText.setFillColor(sf::Color::White);
-    m_backButtonText.setPosition(width - 130, 68);
+    // 4. Action Button (Save/Load) - Initially hidden
+    m_actionBtn = std::make_unique<Theme::Button>(
+        font, "ACTION", sf::Vector2f(300, 60),
+        sf::Vector2f(PREVIEW_X + 175, PREVIEW_Y + PREVIEW_SIZE + 100),
+        Theme::BtnSuccess
+    );
 
+    // 5. Preview Elements
     m_previewBoardBg.setSize(sf::Vector2f(PREVIEW_SIZE + 20, PREVIEW_SIZE + 20));
     m_previewBoardBg.setPosition(PREVIEW_X - 10, PREVIEW_Y - 10);
-    m_previewBoardBg.setFillColor(sf::Color(222, 184, 135));
+    m_previewBoardBg.setFillColor(sf::Color(222, 184, 135)); // Wooden color
 
     m_infoText.setFont(font);
-    m_infoText.setCharacterSize(20);
-    m_infoText.setFillColor(sf::Color::White);
+    m_infoText.setCharacterSize(18);
+    m_infoText.setFillColor(Theme::TextNormal);
     m_infoText.setPosition(PREVIEW_X, PREVIEW_Y + PREVIEW_SIZE + 20);
 
-    m_actionBtn.setSize(sf::Vector2f(300, 60));
-    m_actionBtn.setPosition(PREVIEW_X + 25, PREVIEW_Y + PREVIEW_SIZE + 80);
-
-    m_actionBtnText.setFont(font);
-    m_actionBtnText.setCharacterSize(20);
-    m_actionBtnText.setFillColor(sf::Color::White);
-
-    // 2. Initialize Slots
-    float currentY = SLOT_START_Y;
+    // 6. Init Slots
     m_slots.clear();
+    float currentY = SLOT_START_Y;
+
     for (int i = 1; i <= 5; ++i) {
         SaveSlot slot;
         slot.id = i;
-        slot.shape.setSize(sf::Vector2f(300, 50));
-        slot.shape.setPosition(80, currentY);
-        slot.shape.setOutlineThickness(2);
-        slot.labelText.setFont(font);
-        slot.labelText.setCharacterSize(20);
-        slot.labelText.setPosition(100, currentY + 12);
 
-        slot.delBtn.setSize(sf::Vector2f(40, 40));
-        slot.delBtn.setPosition(400, currentY + 5);
-        slot.delBtn.setFillColor(sf::Color(200, 60, 60));
+        // Slot Button (The big rectangle)
+        slot.slotBtn = std::make_shared<Theme::Button>(
+            font, "Empty Slot", sf::Vector2f(350, 50),
+            sf::Vector2f(255, currentY + 25), // Center X is ~255
+            Theme::BtnDisabled
+        );
 
-        slot.delBtnText.setFont(font);
-        slot.delBtnText.setString("X");
-        slot.delBtnText.setCharacterSize(20);
-        slot.delBtnText.setPosition(412, currentY + 8);
+        // Delete Button (The small X)
+        slot.delBtn = std::make_shared<Theme::Button>(
+            font, "X", sf::Vector2f(40, 40),
+            sf::Vector2f(480, currentY + 25),
+            Theme::BtnDanger
+        );
 
         m_slots.push_back(slot);
-        currentY += 70;
+        currentY += 70; // Spacing
     }
 
-    // 3. CRITICAL: Initialize Preview Engine
-    // If this is missing, loadGame() on preview will crash
     m_previewEngine.initialize_board(19);
-
-    m_showPreview = false;
-    m_showActionBtn = false;
-    m_selectedSlotId = -1;
+    reload();
 }
 
 void BaseSlotScreen::reload() {
@@ -99,20 +93,24 @@ void BaseSlotScreen::refreshSlots() {
 
     for (auto& slot : m_slots) {
         std::string path = getFilePath(slot.id);
+
         if (fs::exists(path)) {
             slot.isEmpty = false;
-            slot.shape.setFillColor(sf::Color(60, 60, 60));
-            slot.labelText.setString("save_0" + std::to_string(slot.id));
-            slot.labelText.setFillColor(sf::Color::White);
+            // Update Text and Color for occupied slot
+            slot.slotBtn->setText("Save File " + std::to_string(slot.id));
+            slot.slotBtn->setFillColor(Theme::BtnPrimary);
         } else {
             slot.isEmpty = true;
-            slot.shape.setFillColor(sf::Color(40, 40, 40));
-            slot.labelText.setString("Empty Slot");
-            slot.labelText.setFillColor(sf::Color(100, 100, 100));
+            slot.slotBtn->setText("Empty Slot");
+            slot.slotBtn->setFillColor(Theme::BtnDisabled);
         }
 
-        if (slot.id == m_selectedSlotId) slot.shape.setOutlineColor(sf::Color::Yellow);
-        else slot.shape.setOutlineColor(sf::Color(100, 100, 100));
+        // Highlight Selected Slot
+        if (slot.id == m_selectedSlotId) {
+            slot.slotBtn->setOutlineColor(sf::Color::Yellow);
+        } else {
+            slot.slotBtn->setOutlineColor(sf::Color::White);
+        }
     }
 }
 
@@ -124,21 +122,18 @@ void BaseSlotScreen::updatePreview(int slotId) {
         if (fs::exists(path)) {
             int savedMode = 0;
             int savedDiff = 0;
-
-            // Load mode AND difficulty
             if (m_previewEngine.loadGame(path, savedMode, savedDiff)) {
                 m_showPreview = true;
                 std::string pName = (m_previewEngine.getCurrentPlayer() == Player::BLACK) ? "Black" : "White";
 
-                std::string modeStr = "2-Player Mode";
-                if (savedMode == 1) { // AI Mode
-                    if (savedDiff == 1) modeStr = "VS AI (Easy)";
-                    else if (savedDiff == 2) modeStr = "VS AI (Medium)";
-                    else if (savedDiff == 3) modeStr = "VS AI (Hard)";
-                    else modeStr = "VS AI";
+                std::string modeStr = "2-Player";
+                if (savedMode == 1) {
+                    if (savedDiff == 1) modeStr = "AI (Easy)";
+                    else if (savedDiff == 2) modeStr = "AI (Medium)";
+                    else if (savedDiff == 3) modeStr = "AI (Hard)";
+                    else modeStr = "AI";
                 }
-
-                m_infoText.setString("Turn: " + pName + "\n" + modeStr);
+                m_infoText.setString("Mode: " + modeStr + " | Turn: " + pName);
             }
         } else {
             m_showPreview = false;
@@ -150,8 +145,8 @@ void BaseSlotScreen::updatePreview(int slotId) {
 }
 
 void BaseSlotScreen::drawPreviewBoard(sf::RenderWindow& window, const StoneTextureManager& tm) {
-    window.draw(m_previewBoardBg);
     if (!m_showPreview) return;
+    window.draw(m_previewBoardBg);
 
     int boardSize = 19;
     float cellSize = PREVIEW_SIZE / (boardSize + 1);
@@ -198,28 +193,22 @@ void BaseSlotScreen::drawPreviewBoard(sf::RenderWindow& window, const StoneTextu
 void BaseSlotScreen::draw(sf::RenderWindow& window, const StoneTextureManager& tm) {
     window.draw(m_background);
     window.draw(m_titleText);
-    window.draw(m_backButton);
-    window.draw(m_backButtonText);
+    m_backButton->draw(window);
 
-    if (m_selectedSlotId != -1) {
-        window.draw(m_infoText);
-        if (m_showActionBtn) {
-            window.draw(m_actionBtn);
-            window.draw(m_actionBtnText);
-        }
-        // Only draw preview if we have one
-        if(m_showPreview) {
-            drawPreviewBoard(window, tm);
+    // Draw Slots
+    for (const auto& slot : m_slots) {
+        slot.slotBtn->draw(window);
+        if (!slot.isEmpty) {
+            slot.delBtn->draw(window);
         }
     }
 
-    for (const auto& slot : m_slots) {
-        window.draw(slot.shape);
-        window.draw(slot.labelText);
-        // Only draw delete button if slot occupied
-        if (!slot.isEmpty) {
-            window.draw(slot.delBtn);
-            window.draw(slot.delBtnText);
+    // Draw Preview
+    if (m_selectedSlotId != -1) {
+        drawPreviewBoard(window, tm);
+        window.draw(m_infoText);
+        if (m_showActionBtn) {
+            m_actionBtn->draw(window);
         }
     }
 }

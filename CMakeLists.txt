@@ -66,6 +66,7 @@ add_executable(GoGame_CS160
         src/KataGoRunner.cpp
         include/NewGameScreen.h
         src/NewGameScreen.cpp
+        include/Theme.h
 )
 
 # 5. Link SFML to our executable

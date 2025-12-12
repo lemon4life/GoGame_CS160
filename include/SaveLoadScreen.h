@@ -4,43 +4,40 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include <memory> // Required for unique_ptr
 #include "Board.h"
 #include "TextureManager.h"
+#include "Theme.h" // Include your new theme
 
-// --- BASE CLASS (Shared UI & Logic) ---
 class BaseSlotScreen {
 protected:
-    // UI Elements
     sf::RectangleShape m_background;
     sf::Text m_titleText;
-    sf::RectangleShape m_backButton;
-    sf::Text m_backButtonText;
 
-    sf::RectangleShape m_actionBtn;
-    sf::Text m_actionBtnText;
+    // Replaced raw shapes with Smart Pointers to Buttons
+    std::unique_ptr<Theme::Button> m_backButton;
+    std::unique_ptr<Theme::Button> m_actionBtn;
+
     bool m_showActionBtn;
 
     struct SaveSlot {
         int id;
         bool isEmpty;
-        sf::RectangleShape shape;
-        sf::Text labelText;
-        sf::RectangleShape delBtn;
-        sf::Text delBtnText;
+        // Each slot has a main button and a delete button
+        std::shared_ptr<Theme::Button> slotBtn;
+        std::shared_ptr<Theme::Button> delBtn;
     };
     std::vector<SaveSlot> m_slots;
 
-    // Preview
+    // Preview Variables
     GoEngine m_previewEngine;
     bool m_showPreview;
     int m_selectedSlotId;
-
     sf::RectangleShape m_previewBoardBg;
     sf::Text m_infoText;
 
 public:
     virtual ~BaseSlotScreen() = default;
-
     void init(const sf::Font& font, float width, float height, const std::string& title);
     void refreshSlots();
     void draw(sf::RenderWindow& window, const StoneTextureManager& textureManager);
@@ -49,23 +46,18 @@ public:
     void updatePreview(int slotId);
     void reload();
 
-
 protected:
     std::string getFilePath(int id);
-
-
     virtual void updateActionButtonState() = 0;
 };
 
-// --- SAVE SCREEN SUBCLASS ---
-class SaveScreen : public BaseSlotScreen { // <--- Fixed line
+class SaveScreen : public BaseSlotScreen {
 public:
     int handleMouseClick(const sf::Vector2i& mousePos) override;
 protected:
     void updateActionButtonState() override;
 };
 
-// --- LOAD SCREEN SUBCLASS ---
 class LoadScreen : public BaseSlotScreen {
 public:
     int handleMouseClick(const sf::Vector2i& mousePos) override;

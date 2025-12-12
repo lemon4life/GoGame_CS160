@@ -136,7 +136,7 @@ void GoEngine::clean_up_dead(){
 //--------PUBLIC FUNCTION DEFINITIONS----------
 
 void GoEngine::initialize_board(int Size){
-    boardSize = Size; cur_move = 0; currentPlayer = Player::WHITE;
+    boardSize = Size; cur_move = 0; currentPlayer = Player::BLACK;
     board.clear(); board.assign(Size+1, vector<Player>(Size+1, Player::NONE));
     zobristTable.clear(); zobristTable.assign(Size+1, vector<vector<uint64_t>>(Size+1, vector<uint64_t>(2, 0)));
     dead = vector< vector<bool> >(boardSize+1, vector<bool>(boardSize+1, 0));
