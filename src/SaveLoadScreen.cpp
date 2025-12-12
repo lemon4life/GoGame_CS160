@@ -117,24 +117,34 @@ void BaseSlotScreen::refreshSlots() {
 }
 
 void BaseSlotScreen::updatePreview(int slotId) {
-    // If we click a different slot, reload preview
     if (slotId != m_selectedSlotId) {
         m_selectedSlotId = slotId;
         std::string path = getFilePath(slotId);
 
         if (fs::exists(path)) {
-            // Try loading. If preview engine wasn't init, this might crash.
-            if (m_previewEngine.loadGame(path)) {
+            int savedMode = 0;
+            int savedDiff = 0;
+
+            // Load mode AND difficulty
+            if (m_previewEngine.loadGame(path, savedMode, savedDiff)) {
                 m_showPreview = true;
                 std::string pName = (m_previewEngine.getCurrentPlayer() == Player::BLACK) ? "Black" : "White";
-                m_infoText.setString("Turn: " + pName + "\n2-Player Mode");
+
+                std::string modeStr = "2-Player Mode";
+                if (savedMode == 1) { // AI Mode
+                    if (savedDiff == 1) modeStr = "VS AI (Easy)";
+                    else if (savedDiff == 2) modeStr = "VS AI (Medium)";
+                    else if (savedDiff == 3) modeStr = "VS AI (Hard)";
+                    else modeStr = "VS AI";
+                }
+
+                m_infoText.setString("Turn: " + pName + "\n" + modeStr);
             }
         } else {
             m_showPreview = false;
             m_infoText.setString("Empty Slot");
         }
     }
-    // Always refresh UI colors and button text
     refreshSlots();
     updateActionButtonState();
 }

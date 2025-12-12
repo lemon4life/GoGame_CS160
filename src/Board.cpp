@@ -338,13 +338,15 @@ pair<float, float> GoEngine::calculateScore(){
     return {Bpt, Wpt};
 }
 
-bool GoEngine::saveGame(const std::string& filepath){
+bool GoEngine::saveGame(const std::string& filepath, int gameMode, int aiDifficulty){
     ofstream outfile(filepath);
-
     if (!outfile.is_open()) {
         cerr << "Error: Could not open file for writing: " << filepath << endl;
         return false;
     }
+
+    outfile << gameMode << endl;
+    outfile << aiDifficulty << endl;
 
     outfile << boardSize << endl;
     outfile << komi << endl;
@@ -355,13 +357,15 @@ bool GoEngine::saveGame(const std::string& filepath){
     return true;
 }
 
-bool GoEngine::loadGame(const string& filepath){
+bool GoEngine::loadGame(const string& filepath, int& gameModeRef, int& aiDifficultyRef) {
     ifstream infile(filepath);
-
     if(!infile.is_open()){
         cerr << "Error: Could not open file for reading: " << filepath << endl;
         return false;
     }
+
+    if (!(infile >> gameModeRef)) gameModeRef = 0;
+    if (!(infile >> aiDifficultyRef)) aiDifficultyRef = 0;
 
     infile >> boardSize;
     initialize_board(boardSize);

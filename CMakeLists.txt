@@ -63,6 +63,9 @@ add_executable(GoGame_CS160
         src/GameOverScreen.cpp
         src/ToggleScreen.cpp
         include/ToggleScreen.h
+        src/KataGoRunner.cpp
+        include/NewGameScreen.h
+        src/NewGameScreen.cpp
 )
 
 # 5. Link SFML to our executable
@@ -79,6 +82,17 @@ add_custom_command(TARGET GoGame_CS160 POST_BUILD
         ${DESTINATION_DIR}/assets
         COMMENT "Copying assets..."
 )
+
+# --- NEW: Copy AI folder to the build folder ---
+set(AI_DIR ${CMAKE_SOURCE_DIR}/AI)
+
+add_custom_command(TARGET GoGame_CS160 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${AI_DIR}
+        ${DESTINATION_DIR}/AI
+        COMMENT "Copying AI engine files..."
+)
+# -----------------------------------------------
 
 # 7. [AUTO-FIX] Copy OpenAL32.dll (Audio Fix for YOU)
 # This puts the sound driver next to the .exe so you don't crash

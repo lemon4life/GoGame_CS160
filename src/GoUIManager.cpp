@@ -137,11 +137,17 @@ void GoUIManager::draw(sf::RenderTarget& window) {
     window.draw(panel);
 
     if (game.getCurrentPlayer() == Stone::Black) {
-        turnIndicator.setString("Turn: White");
+        turnIndicator.setString("Turn: Black");
         turnIndicator.setFillColor(sf::Color::White);
     } else {
-        turnIndicator.setString("Turn: Black");
-        turnIndicator.setFillColor(sf::Color::Cyan);
+        // CHECK AI STATUS
+        if (game.isAIThinking()) {
+            turnIndicator.setString("AI Thinking...");
+            turnIndicator.setFillColor(sf::Color::Red);
+        } else {
+            turnIndicator.setString("Turn: White");
+            turnIndicator.setFillColor(sf::Color::Cyan);
+        }
     }
     window.draw(turnIndicator);
 
