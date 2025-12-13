@@ -30,15 +30,6 @@
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/MainMenuScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/MainMenuScreen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SettingsScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SettingsScreen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MainMenuScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TextureManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +132,8 @@
       <workItem from="1763991780958" duration="1182000" />
       <workItem from="1765509837627" duration="15659000" />
       <workItem from="1765593496668" duration="4862000" />
-      <workItem from="1765618104172" duration="2222000" />
+      <workItem from="1765618104172" duration="3509000" />
+      <workItem from="1765628282488" duration="7000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
