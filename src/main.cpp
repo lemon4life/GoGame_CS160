@@ -15,7 +15,6 @@
 #include <iomanip>
 #include <sstream>
 
-// Helper to handle clicks on the board
 void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& ui) {
     if (mousePos.x >= BOARD_MAX_WIDTH) return;
     int gx = std::round((mousePos.x - GRID_OFFSET) / CELL_SIZE);
@@ -188,13 +187,13 @@ int main() {
         }
 
         switch (currentGameState) {
+            case GameState::EXIT: window.close(); break;
             case GameState::MENU: mainMenu.draw(window); break;
             case GameState::NEW_GAME_MENU: mainMenu.draw(window); newGameScreen.draw(window); break;
             case GameState::SETTINGS: settingsScreen.draw(window); break;
             case GameState::GAME_OVER: gameOverScreen.draw(window); break;
             case GameState::SAVE_MENU: saveScreen.draw(window, textureManager); break;
             case GameState::LOAD_MENU: loadScreen.draw(window, textureManager); break;
-            // Playing is handled by the common renderer above
         }
 
         window.display();

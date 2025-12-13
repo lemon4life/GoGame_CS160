@@ -29,22 +29,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/include/Theme.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GameOverScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameOverScreen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GoUIManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoUIManager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/NewGameScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/NewGameScreen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/SaveLoadScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SaveLoadScreen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Board.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameOverScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameOverScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/MainMenuScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/MainMenuScreen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SettingsScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SettingsScreen.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GoUIManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LoadScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NewGameScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/NewGameScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainMenuScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainMenuScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveLoadScreen.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SaveScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SettingsScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SettingsScreen.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/TextureManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
@@ -128,11 +120,6 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -152,7 +139,9 @@
       <workItem from="1763961050898" duration="3558000" />
       <workItem from="1763989859333" duration="923000" />
       <workItem from="1763991780958" duration="1182000" />
-      <workItem from="1765509837627" duration="15358000" />
+      <workItem from="1765509837627" duration="15659000" />
+      <workItem from="1765593496668" duration="4862000" />
+      <workItem from="1765618104172" duration="2222000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
@@ -183,10 +172,6 @@
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/GoUIManager.cpp</url>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/main.cpp</url>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

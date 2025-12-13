@@ -6,15 +6,15 @@ StoneTextureManager::StoneTextureManager() {
 
     if (!b.loadFromFile("assets/img/stones/glass_blackstone.png")) std::cerr << "Error loading black stone\n";
     if (!w.loadFromFile("assets/img/stones/glass_whitestone.png")) std::cerr << "Error loading white stone\n";
-    stoneSets.push_back({b, w}); // Classic set
+    stoneSets.push_back({b, w});
 
     if (!b.loadFromFile("assets/img/stones/flat_blackstone.png")) std::cerr << "Error loading black stone\n";
     if (!w.loadFromFile("assets/img/stones/flat_whitestone.png")) std::cerr << "Error loading white stone\n";
-    stoneSets.push_back({b, w}); // Classic setif (!b.loadFromFile("assets/img/stones/glass_blackstone.png")) std::cerr << "Error loading black stone\n";
+    stoneSets.push_back({b, w});
 
     if (!b.loadFromFile("assets/img/stones/star_blackstone.png")) std::cerr << "Error loading black stone\n";
     if (!w.loadFromFile("assets/img/stones/star_whitestone.png")) std::cerr << "Error loading white stone\n";
-    stoneSets.push_back({b, w}); // Classic setif (!b.loadFromFile("assets/img/stones/glass_blackstone.png")) std::cerr << "Error loading black stone\n";
+    stoneSets.push_back({b, w});
 }
 
 const sf::Texture& StoneTextureManager::getTexture(Stone type, int styleIndex) const {

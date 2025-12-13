@@ -103,8 +103,24 @@ bool GoGame::isAIThinking() const {
 }
 
 bool GoGame::passTurn() { return engine.pass_move(); }
-bool GoGame::undo() { return engine.undo_step(); }
-bool GoGame::redo() { return engine.redo_step(); }
+bool GoGame::undo() {
+    if (engine.undo_step()) {
+        audio.playPlaceStone();
+        return true;
+    }
+
+    audio.playError();
+    return false;
+}
+bool GoGame::redo() {
+    if (engine.redo_step()) {
+        audio.playPlaceStone();
+        return true;
+    }
+
+    audio.playError();
+    return false;
+}
 void GoGame::resetGame() { engine.initialize_board(BOARD_SIZE); }
 void GoGame::setAIDifficulty(AIDifficulty diff) {
     currentDifficulty = diff;

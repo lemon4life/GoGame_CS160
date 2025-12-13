@@ -1,156 +1,164 @@
-#include "SettingsScreen.h"
+#include "../include/SettingsScreen.h"
 #include <iostream>
 #include <algorithm>
 
-SettingsScreen::SettingsScreen(GameSettings& s, StoneTextureManager& tm, AudioManager& am) 
-    : settings(s), textureMgr(tm), audioMgr(am) 
+SettingsScreen::SettingsScreen(GameSettings& s, StoneTextureManager& tm, AudioManager& am)
+    : settings(s), textureMgr(tm), audioMgr(am)
 {
     if (!font.loadFromFile("assets/fonts/arial.ttf")) {
-        std::cerr << "[SettingsScreen] Error loading assets/fonts/arial.ttf" << std::endl;
+        std::cerr << "[Settings] Error loading font" << std::endl;
     }
 
-    // Setup Title
+    // 1. Setup Background & Title
+    background.setSize(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
+    background.setFillColor(Theme::Background);
+
     titleText.setFont(font);
     titleText.setString("SETTINGS");
     titleText.setCharacterSize(40);
-    titleText.setPosition(WINDOW_WIDTH / 2.0f - 100, 50);
-    titleText.setFillColor(sf::Color::White);
+    titleText.setFillColor(Theme::TextNormal);
 
-    // Setup Dark Overlay Background
-    background.setSize(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
-    background.setFillColor(sf::Color(30, 30, 30));
+    // Center Title
+    sf::FloatRect tb = titleText.getLocalBounds();
+    titleText.setOrigin(tb.width / 2.0f, tb.height / 2.0f);
+    titleText.setPosition(WINDOW_WIDTH / 2.0f, 100);
 
-    // Create the main setting buttons
-    createButton(0, "Board Theme: ", 130);
-    createButton(1, "Stone Style: ", 190);
-    createButton(2, "Sound Effects: ", 250);
-    createButton(3, "Music: ", 310);
-    createButton(6, "BGM Track: ", 370); // <--- NEW BUTTON
+    // 2. Setup Volume Text Display
+    volumeText.setFont(font);
+    volumeText.setCharacterSize(24);
+    volumeText.setFillColor(Theme::TextNormal);
+    volumeText.setPosition(WINDOW_WIDTH / 2.0f - 40, 535);
 
-    // Volume Control Buttons
-    createButton(4, "Volume -", 450);
-    createButton(5, "Volume +", 450);
+    // 3. Setup Buttons using Helper
+    // ID mapping: 0:Theme, 1:Style, 2:Sound, 3:Music, 6:BGM, 4:Vol-, 5:Vol+
 
-    // Adjust Volume Buttons layout
-    buttons[5].rect.setSize(sf::Vector2f(100, 40)); // Vol - is index 5 (pushed order matters)
-    buttons[5].rect.setPosition(WINDOW_WIDTH/2.0f - 120, 450);
+    float startY = 200.0f;
+    float gap = 70.0f;
 
-    buttons[6].rect.setSize(sf::Vector2f(100, 40)); // Vol + is index 6
-    buttons[6].rect.setPosition(WINDOW_WIDTH/2.0f + 20, 450);
+    addButton(0, "Board Theme: ", startY);
+    addButton(1, "Stone Style: ", startY + gap);
+    addButton(2, "Sound Effects: ", startY + gap * 2);
+    addButton(3, "Music: ", startY + gap * 3);
+    addButton(6, "BGM Track: ", startY + gap * 4);
 
-    // Back Button
-    backButtonRect.setSize(sf::Vector2f(200, 50));
-    backButtonRect.setFillColor(sf::Color(200, 50, 50));
-    backButtonRect.setPosition(WINDOW_WIDTH/2.0f - 100, 600);
+    // Volume Buttons (Smaller, Side-by-Side)
+    float volY = 550.0f;
+    addButton(4, "Vol -", volY, 100.0f, -120.0f); // Left
+    addButton(5, "Vol +", volY, 100.0f, 120.0f);  // Right
 
-    backButtonText.setFont(font);
-    backButtonText.setString("BACK");
-    backButtonText.setCharacterSize(24);
-    sf::FloatRect b = backButtonText.getLocalBounds();
-    backButtonText.setOrigin(b.width / 2.0f, b.height / 2.0f);
-    backButtonText.setPosition(WINDOW_WIDTH/2.0f, 625);
+    // 4. Setup Back Button
+    backButton = std::make_unique<Theme::Button>(
+        font, "BACK",
+        sf::Vector2f(200, 50),
+        sf::Vector2f(WINDOW_WIDTH / 2.0f, 620),
+        Theme::BtnDanger
+    );
 }
 
-void SettingsScreen::createButton(int id, const std::string& label, float y) {
-    SettingButton btn;
-    btn.id = id;
-    btn.labelPrefix = label;
+void SettingsScreen::addButton(int id, const std::string& label, float y, float width, float xOffset) {
+    auto btn = std::make_unique<Theme::Button>(
+        font, label,
+        sf::Vector2f(width, 40),
+        sf::Vector2f(WINDOW_WIDTH / 2.0f + xOffset, y),
+        Theme::BtnDisabled // Use Grey for settings toggles
+    );
 
-    // Default size
-    btn.rect.setSize(sf::Vector2f(400, 40));
-    btn.rect.setPosition(WINDOW_WIDTH/2.0f - 200, y);
-    btn.rect.setFillColor(sf::Color(60, 60, 60));
-
-    btn.text.setFont(font);
-    btn.text.setCharacterSize(20);
-    btn.text.setFillColor(sf::Color::White);
-
-    buttons.push_back(btn);
+    m_buttons.push_back({std::move(btn), id, label});
 }
 
 void SettingsScreen::updateTexts() {
-    for (auto& btn : buttons) {
+    // 1. Update Dynamic Labels
+    for (auto& item : m_buttons) {
         std::string suffix = "";
 
-        if (btn.id == 0) { // Board Theme
+        if (item.id == 0) { // Theme
             if (settings.boardThemeIndex == 0) suffix = "Wood";
             else if (settings.boardThemeIndex == 1) suffix = "Ocean";
             else suffix = "Galaxy";
+            item.btn->setText(item.labelPrefix + suffix);
         }
-        else if (btn.id == 1) suffix = textureMgr.getStyleName(settings.stoneStyleIndex);
-        else if (btn.id == 2) suffix = settings.soundEnabled ? "ON" : "OFF";
-        else if (btn.id == 3) suffix = settings.musicEnabled ? "ON" : "OFF";
-        else if (btn.id == 6) suffix = audioMgr.getCurrentTrackName(); // <--- NEW SUFFIX
-
-        // Only append suffix for selection buttons
-        if (btn.id != 4 && btn.id != 5) {
-            btn.text.setString(btn.labelPrefix + suffix);
-        } else {
-            btn.text.setString(btn.labelPrefix);
+        else if (item.id == 1) { // Style
+            suffix = textureMgr.getStyleName(settings.stoneStyleIndex);
+            item.btn->setText(item.labelPrefix + suffix);
         }
-
-        // Recenter text
-        sf::FloatRect b = btn.text.getLocalBounds();
-        btn.text.setOrigin(b.width/2.0f, b.height/2.0f);
-        btn.text.setPosition(
-            btn.rect.getPosition().x + btn.rect.getSize().x/2.0f,
-            btn.rect.getPosition().y + btn.rect.getSize().y/2.0f
-        );
+        else if (item.id == 2) { // Sound
+            suffix = settings.soundEnabled ? "ON" : "OFF";
+            item.btn->setText(item.labelPrefix + suffix);
+            // Optional: Visual feedback (Green for ON, Red for OFF)
+            item.btn->setOutlineColor(settings.soundEnabled ? Theme::BtnSuccess : Theme::BtnDanger);
+        }
+        else if (item.id == 3) { // Music
+            suffix = settings.musicEnabled ? "ON" : "OFF";
+            item.btn->setText(item.labelPrefix + suffix);
+            item.btn->setOutlineColor(settings.musicEnabled ? Theme::BtnSuccess : Theme::BtnDanger);
+        }
+        else if (item.id == 6) { // BGM Track
+            suffix = audioMgr.getCurrentTrackName();
+            item.btn->setText(item.labelPrefix + suffix);
+        }
+        // Vol- and Vol+ (IDs 4, 5) text doesn't change
     }
+
+    // 2. Update Volume Text
+    volumeText.setString("Vol: " + std::to_string((int)settings.volume) + "%");
 }
 
 void SettingsScreen::draw(sf::RenderWindow& window) {
-    updateTexts();
+    updateTexts(); // Refresh logic before drawing
 
     window.draw(background);
     window.draw(titleText);
 
-    for (const auto& btn : buttons) {
-        window.draw(btn.rect);
-        window.draw(btn.text);
+    for (const auto& item : m_buttons) {
+        item.btn->draw(window);
     }
 
-    // Draw Volume Indicator
-    sf::Text volText("Vol: " + std::to_string((int)settings.volume) + "%", font, 24);
-    volText.setPosition(WINDOW_WIDTH/2.0f - 40, 500);
-    window.draw(volText);
-
-    window.draw(backButtonRect);
-    window.draw(backButtonText);
+    window.draw(volumeText);
+    backButton->draw(window);
 }
 
 bool SettingsScreen::handleClick(const sf::Vector2i& mousePos) {
-    sf::Vector2f pos(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-
-    if (backButtonRect.getGlobalBounds().contains(pos)) {
-        return true;
+    // 1. Check Back Button
+    if (backButton->isClicked(mousePos)) {
+        return true; // Signal to exit settings
     }
 
-    for (auto& btn : buttons) {
-        if (btn.rect.getGlobalBounds().contains(pos)) {
-            // Toggle Logic
-            if (btn.id == 0) settings.boardThemeIndex = (settings.boardThemeIndex + 1) % 3;
-            else if (btn.id == 1) settings.stoneStyleIndex = (settings.stoneStyleIndex + 1) % STONESNUM;
-            else if (btn.id == 2) settings.soundEnabled = !settings.soundEnabled;
-            else if (btn.id == 3) {
-                settings.musicEnabled = !settings.musicEnabled;
-                audioMgr.updateMusicState();
+    // 2. Check Setting Toggles
+    for (auto& item : m_buttons) {
+        if (item.btn->isClicked(mousePos)) {
+            // Apply Logic based on ID
+            switch (item.id) {
+                case 0: // Theme
+                    settings.boardThemeIndex = (settings.boardThemeIndex + 1) % 3;
+                    break;
+                case 1: // Stone Style
+                    settings.stoneStyleIndex = (settings.stoneStyleIndex + 1) % STONESNUM;
+                    break;
+                case 2: // Sound
+                    settings.soundEnabled = !settings.soundEnabled;
+                    break;
+                case 3: // Music
+                    settings.musicEnabled = !settings.musicEnabled;
+                    audioMgr.updateMusicState();
+                    break;
+                case 4: // Vol -
+                    settings.volume = std::max(0.0f, settings.volume - 10.0f);
+                    audioMgr.updateMusicState();
+                    break;
+                case 5: // Vol +
+                    settings.volume = std::min(100.0f, settings.volume + 10.0f);
+                    audioMgr.updateMusicState();
+                    break;
+                case 6: // BGM Track
+                    int count = audioMgr.getTrackCount();
+                    if (count > 0) {
+                        settings.bgmIndex = (settings.bgmIndex + 1) % count;
+                        audioMgr.changeBGM(settings.bgmIndex);
+                    }
+                    break;
             }
-            else if (btn.id == 4) { // Vol -
-                settings.volume = std::max(0.0f, settings.volume - 10.0f);
-                audioMgr.updateMusicState();
-            }
-            else if (btn.id == 5) { // Vol +
-                settings.volume = std::min(100.0f, settings.volume + 10.0f);
-                audioMgr.updateMusicState();
-            }
-            else if (btn.id == 6) { // BGM Track
-                int count = audioMgr.getTrackCount();
-                if (count > 0) {
-                    settings.bgmIndex = (settings.bgmIndex + 1) % count;
-                    audioMgr.changeBGM(settings.bgmIndex);
-                }
-            }
+            // Break loop after clicking one button to prevent overlap issues
+            return false;
         }
     }
     return false;

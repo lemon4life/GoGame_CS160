@@ -6,7 +6,7 @@
 namespace fs = std::filesystem;
 
 // Layout Constants
-const float PREVIEW_X = 650.0f;
+const float PREVIEW_X = 600.0f ;
 const float PREVIEW_Y = 150.0f;
 const float PREVIEW_SIZE = 350.0f;
 const float SLOT_START_Y = 150.0f;

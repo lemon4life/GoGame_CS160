@@ -1,33 +1,32 @@
-#pragma once
+#ifndef MAINMENUSCREEN_H
+#define MAINMENUSCREEN_H
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-#include "Definitions.h"
+#include <memory>
 #include "GoGame.h"
+#include "Definitions.h"
+#include "Theme.h" // Includes Theme::Button
 
 class MainMenuScreen {
 private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
+
+    sf::Font font;
     sf::Font titleFont;
-    sf::Font buttonFont;
     sf::Text titleText;
 
-    std::vector<sf::RectangleShape> menuButtonRects;
-    std::vector<sf::Text> menuButtonTexts;
-    std::vector<std::string> buttonLabels;
-
-    // Menu Layout Constants (Internal helper)
-    const int MENU_BTN_WIDTH = 250;
-    const int MENU_BTN_HEIGHT = 50;
-    const int MENU_START_X = 100;
-    const int MENU_START_Y = 250;
+    // Optimized: Store buttons in a list
+    std::vector<std::pair<Theme::Button, std::string>> m_buttons;
 
 public:
     MainMenuScreen();
-
     void draw(sf::RenderWindow& window);
-    
-    // Returns the new state (e.g. PLAYING, SETTINGS) based on clicks
+
+    // Returns the next GameState
     GameState handleEvent(const sf::Event& event, const sf::Vector2i& mousePos, GoGame& game);
 };
+
+#endif

@@ -4,7 +4,6 @@
 #include <string>
 
 namespace GameRenderer {
-
     static sf::RenderTexture cachedBoard;
     static sf::Sprite cachedBoardSprite;
     static int cachedThemeIndex = -1;
@@ -108,28 +107,41 @@ namespace GameRenderer {
 
     void drawStones(sf::RenderWindow& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
         static sf::Sprite stoneSprite;
+
+        // Pre-fetch texture pointers
         const sf::Texture* blackTex = &tm.getTexture(Stone::Black, settings.stoneStyleIndex);
         const sf::Texture* whiteTex = &tm.getTexture(Stone::White, settings.stoneStyleIndex);
 
-        float scaleFactor = (STONE_RADIUS * 2.0f) / blackTex->getSize().x;
-        float offset = blackTex->getSize().x / 2.0f;
+        // Track the currently applied texture to avoid redundant calculations
+        const sf::Texture* currentTex = nullptr;
 
         for (int y = 0; y < BOARD_SIZE; ++y) {
             for (int x = 0; x < BOARD_SIZE; ++x) {
                 Stone s = game.getStoneAt(x, y);
                 if (s == Stone::Empty) continue;
 
-                if (s == Stone::White) stoneSprite.setTexture(*blackTex);
-                else stoneSprite.setTexture(*whiteTex);
+                // Determine which texture we need
+                const sf::Texture* neededTex = (s == Stone::White) ? blackTex : whiteTex;
 
-                stoneSprite.setOrigin(offset, offset);
-                stoneSprite.setScale(scaleFactor, scaleFactor);
+                // Only update Sprite properties if the texture actually changes
+                if (currentTex != neededTex) {
+                    currentTex = neededTex;
+                    stoneSprite.setTexture(*currentTex);
+
+                    // --- FIX: Recalculate Scale & Origin based on THIS texture's size ---
+                    sf::Vector2u texSize = currentTex->getSize();
+                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
+
+                    stoneSprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f); // Center exactly
+                    stoneSprite.setScale(scaleFactor, scaleFactor);
+                }
+
                 stoneSprite.setPosition(toScreenCoord(x, y));
                 window.draw(stoneSprite);
             }
         }
 
-        // Draw Ghost Stone (Hover)
+        // --- GHOST STONE LOGIC ---
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
         if (mousePos.x < BOARD_MAX_WIDTH) {
             int gx = std::round((mousePos.x - GRID_OFFSET) / CELL_SIZE);
@@ -140,19 +152,25 @@ namespace GameRenderer {
                 if (validMoves[gx + 1][gy + 1]) {
                     Stone currentPlayer = game.getCurrentPlayer();
 
-                    // --- FIX: GHOST STONE COLOR LOGIC ---
-                    // Since currentPlayer is now the one about to move,
-                    // if it is Black, show Black ghost.
-                    if (currentPlayer == Stone::Black) stoneSprite.setTexture(*blackTex);
-                    else stoneSprite.setTexture(*whiteTex);
-                    // ------------------------------------
+                    const sf::Texture* ghostTex = (currentPlayer == Stone::Black) ? blackTex : whiteTex;
+
+                    // Apply texture and recalculate for ghost
+                    stoneSprite.setTexture(*ghostTex);
+                    sf::Vector2u texSize = ghostTex->getSize();
+                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
+
+                    stoneSprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
+                    stoneSprite.setScale(scaleFactor, scaleFactor);
 
                     stoneSprite.setColor(sf::Color(255, 255, 255, 128));
-                    stoneSprite.setOrigin(offset, offset);
-                    stoneSprite.setScale(scaleFactor, scaleFactor);
                     stoneSprite.setPosition(toScreenCoord(gx, gy));
+
                     window.draw(stoneSprite);
+
+                    // Reset color
                     stoneSprite.setColor(sf::Color::White);
+                    // Reset tracker so next frame doesn't assume wrong texture
+                    currentTex = nullptr;
                 }
             }
         }
