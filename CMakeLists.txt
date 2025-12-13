@@ -65,6 +65,7 @@ add_executable(GoGame_CS160
         include/ToggleScreen.h
         src/KataGoRunner.cpp
         include/KataGoRunner.h
+        src/KataGoRunner.cpp
         include/NewGameScreen.h
         src/NewGameScreen.cpp
         include/Theme.h

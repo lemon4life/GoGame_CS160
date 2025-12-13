@@ -138,21 +138,19 @@ std::vector<std::vector<bool>> GoGame::getValidMoves() const {
 }
 
 void GoGame::initAI(Difficulty level) {
-    // 2. Start the process. 
-    // IMPORTANT: These paths are relative to where the .exe runs (your project root usually).
-    bool isRunning = bot.startEngine("./AI/katago.exe", "./AI/model.bin.gz", "./AI/cpu_config.cfg");
+    std::cout << "--- Initializing AI ---" << std::endl;
+
+    // Use simple relative paths
+    bool isRunning = bot.startEngine("./AI/katago.exe", "./AI/model.txt.gz", "./AI/cpu_config.cfg");
 
     if (!isRunning) {
-        std::cerr << "CRITICAL ERROR: AI failed to start. Check file paths!" << std::endl;
-        return;
+        std::cerr << "--- STOPPING: AI could not start. ---" << std::endl;
+        return; // Return safely. DO NOT continue to send commands.
     }
 
-    // 3. The "Handshake" (Basic Setup)
-    // You MUST tell the AI the rules before playing.
-    
-    // Check if it's alive
-    std::cout << "AI says: " << bot.sendCommand("name") << std::endl; 
-    
+    // Only verify if we actually started!
+    std::cout << "AI says: " << bot.sendCommand("name") << std::endl;
+
     // Set Board Size (Standard is 19)
     bot.sendCommand("boardsize 19");
     
