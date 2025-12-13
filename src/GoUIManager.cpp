@@ -1,12 +1,7 @@
-#include "GoUIManager.h"
+#include "../include/GoUIManager.h"
 #include <iostream>
 
 GoUIManager::GoUIManager(GoGame& g) : game(g) {
-    buttonLabels = {
-        "START NEW GAME", "RESET GAME", "UNDO MOVE", "REDO MOVE",
-        "SAVE GAME", "LOAD GAME", "SETTINGS", "EXIT GAME"
-    };
-
     if (!font.loadFromFile("assets/fonts/arial.ttf")) {
         std::cerr << "[GoUIManager] Error loading font" << std::endl;
     }
@@ -15,11 +10,10 @@ GoUIManager::GoUIManager(GoGame& g) : game(g) {
     initializeButtons();
 }
 
-// ... initializeIndicators and initializeButtons same as before ...
 void GoUIManager::initializeIndicators() {
     turnIndicator.setFont(font);
     turnIndicator.setCharacterSize(24);
-    turnIndicator.setFillColor(sf::Color::White);
+    turnIndicator.setFillColor(Theme::TextNormal);
     turnIndicator.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(BUTTON_START_Y_GAME_UI - 40)));
 
     notificationText.setFont(font);
@@ -30,46 +24,33 @@ void GoUIManager::initializeIndicators() {
 }
 
 void GoUIManager::initializeButtons() {
-    // --- NEW: Initialize Pass Button ---
-    // Position: Between Turn Indicator and Main Buttons (at BUTTON_START_Y_GAME_UI)
-    passButtonRect.setSize(sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT));
-    passButtonRect.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(BUTTON_START_Y_GAME_UI)));
-    passButtonRect.setFillColor(sf::Color(50, 100, 200)); // Blue Color
-    passButtonRect.setOutlineThickness(1);
-    passButtonRect.setOutlineColor(sf::Color::White);
-
-    passButtonText.setFont(font);
-    passButtonText.setString("PASS MOVE");
-    passButtonText.setCharacterSize(16);
-    passButtonText.setFillColor(sf::Color::White);
-
-    // Center Text
-    sf::FloatRect pbBounds = passButtonText.getLocalBounds();
-    passButtonText.setOrigin(pbBounds.width / 2.0f, pbBounds.height / 2.0f);
-    passButtonText.setPosition(
-        passButtonRect.getPosition().x + passButtonRect.getSize().x / 2.0f,
-        passButtonRect.getPosition().y + passButtonRect.getSize().y / 2.0f
+    // 1. Initialize Pass Button
+    passButton = std::make_unique<Theme::Button>(
+        font, "PASS MOVE",
+        sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT),
+        sf::Vector2f(BUTTON_START_X_GAME_UI + (PANEL_WIDTH - 2 * BUTTON_PADDING)/2.0f, BUTTON_START_Y_GAME_UI + BUTTON_HEIGHT/2.0f),
+        Theme::BtnPrimary // Blue
     );
 
+    // 2. Initialize Main Buttons
+    std::vector<std::string> labels = {
+        "START NEW GAME", "RESET GAME", "UNDO MOVE", "REDO MOVE",
+        "SAVE GAME", "LOAD GAME", "SETTINGS", "EXIT GAME"
+    };
 
-    int y_pos = BUTTON_START_Y_GAME_UI + 60;
-    for (const auto& label : buttonLabels) {
-        sf::RectangleShape rect;
-        rect.setSize(sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT));
-        rect.setPosition(sf::Vector2f(static_cast<float>(BUTTON_START_X_GAME_UI), static_cast<float>(y_pos)));
-        rect.setFillColor(sf::Color(100, 100, 100));
-        mainButtonRects.push_back(rect);
+    float currentY = BUTTON_START_Y_GAME_UI + 60;
 
-        sf::Text text(label, font, 14);
-        text.setFillColor(sf::Color::White);
-        sf::FloatRect textBounds = text.getLocalBounds();
-        text.setOrigin(textBounds.width / 2.0f, textBounds.height / 2.0f);
-        text.setPosition(
-            rect.getPosition().x + rect.getSize().x / 2.0f,
-            rect.getPosition().y + rect.getSize().y / 2.0f
+    for (const auto& label : labels) {
+        auto btn = std::make_unique<Theme::Button>(
+            font, label,
+            sf::Vector2f(PANEL_WIDTH - 2 * BUTTON_PADDING, BUTTON_HEIGHT),
+            sf::Vector2f(BUTTON_START_X_GAME_UI + (PANEL_WIDTH - 2 * BUTTON_PADDING)/2.0f, currentY + BUTTON_HEIGHT/2.0f),
+            Theme::BtnDisabled, // Dark Grey
+            14 // Smaller font for list
         );
-        mainButtonTexts.push_back(text);
-        y_pos += BUTTON_HEIGHT + BUTTON_PADDING;
+
+        m_buttons.push_back({std::move(btn), label});
+        currentY += BUTTON_HEIGHT + BUTTON_PADDING;
     }
 }
 
@@ -78,10 +59,8 @@ void GoUIManager::setNotification(const std::string& msg) {
 }
 
 bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWindow& window, GameState& currentGameState) {
-    // --- CHECK PASS BUTTON ---
-    sf::Vector2f mPos(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-
-    if (passButtonRect.getGlobalBounds().contains(mPos)) {
+    // 1. Check Pass Button
+    if (passButton->isClicked(mousePos)) {
         bool gameOver = game.passTurn();
         if (gameOver) {
             currentGameState = GameState::GAME_OVER;
@@ -91,16 +70,18 @@ bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWind
         return true;
     }
 
-    for (size_t i = 0; i < mainButtonRects.size(); ++i) {
-        if (mainButtonRects[i].getGlobalBounds().contains(sf::Vector2f(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))) {
-            std::string label = buttonLabels[i];
+    // 2. Check Main Buttons
+    for (const auto& pair : m_buttons) {
+        if (pair.first->isClicked(mousePos)) {
+            const std::string& label = pair.second;
 
             if (label == "EXIT GAME") {
                 currentGameState = GameState::MENU;
             }
             else if (label == "RESET GAME" || label == "START NEW GAME") {
-                game.resetGame();
-                setNotification("New Game Started.");
+                // Usually triggers the New Game Menu now, but depends on your Main.cpp logic
+                // If you want it to go to the mode selection:
+                 currentGameState = GameState::NEW_GAME_MENU;
             }
             else if (label == "UNDO MOVE") {
                 if (game.undo()) setNotification("Move Undone.");
@@ -111,46 +92,49 @@ bool GoUIManager::handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWind
                 else setNotification("Cannot Redo.");
             }
             else if (label == "SAVE GAME") {
-                currentGameState = GameState::SAVE_MENU; // Switch State
+                currentGameState = GameState::SAVE_MENU;
             }
             else if (label == "LOAD GAME") {
-                currentGameState = GameState::LOAD_MENU; // Switch State
+                currentGameState = GameState::LOAD_MENU;
             }
             else if (label == "SETTINGS") {
                 currentGameState = GameState::SETTINGS;
             }
-            else {
-                //wait for Zobrist
-                setNotification("Feature not implemented.");
-            }
+
             return true;
         }
     }
     return false;
 }
 
-//Render
-void GoUIManager::draw(sf::RenderTarget& window) {
+void GoUIManager::draw(sf::RenderWindow& window) {
+    // Draw Panel Background
     sf::RectangleShape panel(sf::Vector2f(PANEL_WIDTH, WINDOW_HEIGHT));
     panel.setPosition(sf::Vector2f(static_cast<float>(WINDOW_WIDTH - PANEL_WIDTH), 0.0f));
     panel.setFillColor(sf::Color(40, 40, 40));
     window.draw(panel);
 
+    // Update Turn Indicator
     if (game.getCurrentPlayer() == Stone::Black) {
-        turnIndicator.setString("Turn: White");
+        turnIndicator.setString("Turn: Black");
         turnIndicator.setFillColor(sf::Color::White);
     } else {
-        turnIndicator.setString("Turn: Black");
-        turnIndicator.setFillColor(sf::Color::Cyan);
+        if (game.isAIThinking()) {
+            turnIndicator.setString("AI Thinking...");
+            turnIndicator.setFillColor(sf::Color::Red);
+        } else {
+            turnIndicator.setString("Turn: White");
+            turnIndicator.setFillColor(sf::Color::Cyan);
+        }
     }
+
     window.draw(turnIndicator);
 
-    window.draw(passButtonRect);
-    window.draw(passButtonText);
-
-    for (size_t i = 0; i < mainButtonRects.size(); ++i) {
-        window.draw(mainButtonRects[i]);
-        window.draw(mainButtonTexts[i]);
+    // Draw Buttons
+    passButton->draw(window);
+    for (const auto& pair : m_buttons) {
+        pair.first->draw(window);
     }
+
     window.draw(notificationText);
 }
