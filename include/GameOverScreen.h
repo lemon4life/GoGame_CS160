@@ -4,9 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-#include <memory>
-#include "Definitions.h"
-#include "Theme.h"
+#include "Definitions.h" 
 
 class GameOverScreen {
 private:
@@ -14,17 +12,21 @@ private:
     sf::RectangleShape container;
     sf::Text titleText;
     sf::Text scoreText;
-
-    // Store Buttons and their action strings
-    std::vector<std::pair<Theme::Button, std::string>> m_buttons;
+    
+    struct Button {
+        sf::RectangleShape rect;
+        sf::Text text;
+        std::string action; // "NEW", "LOAD", "EXIT"
+    };
+    std::vector<Button> buttons;
 
 public:
     void init(const sf::Font& font, float width, float height);
     void setGameOverMessage(const std::string& message, const std::string& scoreDetail);
-
+    
     void draw(sf::RenderWindow& window);
-
-    // Returns: "NEW", "LOAD", "EXIT", or ""
+    
+    // Returns: "NEW", "LOAD", "EXIT", or "" (nothing)
     std::string handleMouseClick(const sf::Vector2i& mousePos);
 };
 

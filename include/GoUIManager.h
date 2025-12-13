@@ -1,38 +1,37 @@
-#ifndef GOUIMANAGER_H
-#define GOUIMANAGER_H
-
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-#include <memory>
-#include "GoGame.h"
 #include "Definitions.h"
-#include "Theme.h"
+#include "GoGame.h" // Needs full definition of GoGame
 
 class GoUIManager {
 private:
-    GoGame& game;
     sf::Font font;
+    GoGame& game;
 
-    // UI Elements
     sf::Text turnIndicator;
     sf::Text notificationText;
 
-    std::unique_ptr<Theme::Button> passButton;
+    std::vector<sf::RectangleShape> mainButtonRects;
+    std::vector<sf::Text> mainButtonTexts;
+    std::vector<std::string> buttonLabels;
 
-    // Store button + its logic label string
-    std::vector<std::pair<std::unique_ptr<Theme::Button>, std::string>> m_buttons;
+    // --- NEW: Pass Button ---
+    sf::RectangleShape passButtonRect;
+    sf::Text passButtonText;
 
     void initializeIndicators();
     void initializeButtons();
 
 public:
-    GoUIManager(GoGame& g);
-    void draw(sf::RenderWindow& window);
+    explicit GoUIManager(GoGame& g);
 
+    // Set a message on the UI (e.g. "Stone Placed")
+    void setNotification(const std::string& msg);
+
+    // Returns true if a button was clicked
     bool handleButtonClick(const sf::Vector2i& mousePos, sf::RenderWindow& window, GameState& currentGameState);
 
-    void setNotification(const std::string& msg);
+    void draw(sf::RenderTarget& window);
 };
-
-#endif

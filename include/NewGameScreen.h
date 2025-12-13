@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "Theme.h" // <--- Include the new class
+#include <string>
+#include "Definitions.h"
 
 class NewGameScreen {
 private:
@@ -9,7 +10,12 @@ private:
     sf::RectangleShape container;
     sf::Text titleText;
 
-    std::vector<std::pair<Theme::Button, std::string>> m_buttons;
+    struct OptionButton {
+        sf::RectangleShape rect;
+        sf::Text text;
+        std::string action; // "PVP", "AI_EASY", "AI_MEDIUM", "AI_HARD", "BACK"
+    };
+    std::vector<OptionButton> buttons;
 
 public:
     void init(const sf::Font& font, float width, float height);

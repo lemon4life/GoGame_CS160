@@ -30,6 +30,25 @@
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Board.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Board.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Definitions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GameOverScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameOverScreen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GameRenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GameRenderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GoGame.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoGame.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/GoUIManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GoUIManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/NewGameScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/NewGameScreen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/SaveLoadScreen.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/SaveLoadScreen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Theme.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Board.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Board.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GameOverScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameOverScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoGame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoGame.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GoUIManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GoUIManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/KataGoRunner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/KataGoRunner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LoadScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LoadScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/NewGameScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/NewGameScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SaveScreen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/SaveScreen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TextureManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/TextureManager.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,34 +92,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;CMake Application.GoGame.executor&quot;: &quot;Run&quot;,
-    &quot;CMake Application.GoGame_CS160.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "CMake Application.GoGame.executor": "Run",
+    "CMake Application.GoGame_CS160.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "Merging main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Admin/OneDrive/Documents/HCMUS/CS160/GoGame_CS160",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CMakeSettings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Admin\OneDrive\Documents\HCMUS\CS160\GoGame_CS160\assets\audio\BGM" />
@@ -112,6 +131,11 @@
   </component>
   <component name="RunManager">
     <configuration name="GoGame_CS160" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GoGame_CS160" TARGET_NAME="GoGame_CS160" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GoGame_CS160" RUN_TARGET_NAME="GoGame_CS160">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>

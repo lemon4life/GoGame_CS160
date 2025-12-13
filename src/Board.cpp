@@ -136,7 +136,7 @@ void GoEngine::clean_up_dead(){
 //--------PUBLIC FUNCTION DEFINITIONS----------
 
 void GoEngine::initialize_board(int Size){
-    boardSize = Size; cur_move = 0; currentPlayer = Player::BLACK;
+    boardSize = Size; cur_move = 0; currentPlayer = Player::WHITE;
     board.clear(); board.assign(Size+1, vector<Player>(Size+1, Player::NONE));
     zobristTable.clear(); zobristTable.assign(Size+1, vector<vector<uint64_t>>(Size+1, vector<uint64_t>(2, 0)));
     dead = vector< vector<bool> >(boardSize+1, vector<bool>(boardSize+1, 0));
@@ -338,15 +338,13 @@ pair<float, float> GoEngine::calculateScore(){
     return {Bpt, Wpt};
 }
 
-bool GoEngine::saveGame(const std::string& filepath, int gameMode, int aiDifficulty){
+bool GoEngine::saveGame(const std::string& filepath){
     ofstream outfile(filepath);
+
     if (!outfile.is_open()) {
         cerr << "Error: Could not open file for writing: " << filepath << endl;
         return false;
     }
-
-    outfile << gameMode << endl;
-    outfile << aiDifficulty << endl;
 
     outfile << boardSize << endl;
     outfile << komi << endl;
@@ -357,15 +355,13 @@ bool GoEngine::saveGame(const std::string& filepath, int gameMode, int aiDifficu
     return true;
 }
 
-bool GoEngine::loadGame(const string& filepath, int& gameModeRef, int& aiDifficultyRef) {
+bool GoEngine::loadGame(const string& filepath){
     ifstream infile(filepath);
+
     if(!infile.is_open()){
         cerr << "Error: Could not open file for reading: " << filepath << endl;
         return false;
     }
-
-    if (!(infile >> gameModeRef)) gameModeRef = 0;
-    if (!(infile >> aiDifficultyRef)) aiDifficultyRef = 0;
 
     infile >> boardSize;
     initialize_board(boardSize);

@@ -29,7 +29,7 @@ bool KataGoRunner::startEngine(std::string exePath, std::string modelPath, std::
     // 2. Prepare Command Line
     // Command: katago.exe gtp -model model.bin.gz -config cpu_config.cfg
     std::string cmdLine = exePath + " gtp -model " + modelPath + " -config " + configPath;
-
+    
     // Windows requires a mutable char buffer for command line
     std::vector<char> cmdVec(cmdLine.begin(), cmdLine.end());
     cmdVec.push_back(0);
@@ -44,12 +44,12 @@ bool KataGoRunner::startEngine(std::string exePath, std::string modelPath, std::
 
     // 3. Launch Process
     bool success = CreateProcessA(NULL, cmdVec.data(), NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &piProcInfo);
-
+    
     // Close the ends of the pipes we don't need (so reading doesn't hang)
     if (success) {
         CloseHandle(g_hChildStd_OUT_Wr);
         CloseHandle(g_hChildStd_IN_Rd);
-        g_hChildStd_OUT_Wr = NULL;
+        g_hChildStd_OUT_Wr = NULL; 
         g_hChildStd_IN_Rd = NULL;
     }
     return success;

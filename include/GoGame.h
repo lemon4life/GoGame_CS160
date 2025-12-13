@@ -7,17 +7,22 @@
 #include <string>
 #include <utility>
 
+using namespace std;
+
 class GoGame {
 private:
     GoEngine engine;
     AudioManager& audio;
 
+    string convertToGTP(int x, int y);
+    void convertFromGTP(std::string gtp, int &x, int &y);
     // --- AI Components ---
-    KataGoRunner aiRunner;
+    KataGoRunner bot;
     GameMode currentMode;
     bool isAiThinking;
-    AIDifficulty currentDifficulty;
+    Difficulty currentDifficulty;
 
+    void setDifficulty(Difficulty level);
 public:
     GoGame(AudioManager& am);
 
@@ -30,16 +35,13 @@ public:
 
     // AI Specific
     void setGameMode(GameMode mode);
-    void initAI(std::string exe, std::string model, std::string cfg);
-    void updateAI(); // Call this in main loop to check for AI move
     bool isAIThinking() const;
 
     bool undo();
     bool redo();
     void resetGame();
 
-    void setAIDifficulty(AIDifficulty diff);
-    AIDifficulty getAIDifficulty() const;
+    Difficulty getAIDifficulty() const;
     GameMode getGameMode() const;
 
     bool saveGame(const std::string& filename);
@@ -48,5 +50,10 @@ public:
     std::pair<float, float> getScore();
     void toggleDeadStone(int x, int y);
     std::vector<std::vector<bool>> getDeadStones() const;
+    void runHeuristic();
+    void initAI(Difficulty level);
+
+    void handleHumanMove(int x, int y, Player side);
+    void doAITurn(Player side, int &x, int &y);
     std::vector<std::vector<bool>> getValidMoves() const;
 };

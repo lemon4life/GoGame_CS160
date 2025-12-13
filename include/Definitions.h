@@ -20,21 +20,10 @@ const int BUTTON_START_X_GAME_UI = WINDOW_WIDTH - PANEL_WIDTH + BUTTON_PADDING;
 const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
 
 // Enums
-enum class AIDifficulty { None, Easy, Medium, Hard };
 enum class Stone { Empty, White, Black };
-enum class GameMode { PVP, AI };
-enum class GameState {
-    MENU,
-    NEW_GAME_MENU,
-    PLAYING,
-    SETTINGS,
-    EXIT,
-    SAVE_MENU,
-    LOAD_MENU,
-    GAME_OVER,
-    SCORING
-};
+enum class GameState { MENU, PLAYING, SETTINGS, EXIT, SAVE_MENU, LOAD_MENU,  GAME_OVER, SCORING};
 
+// Structs
 struct Move {
     int x;
     int y;
@@ -44,12 +33,12 @@ struct Move {
 struct GameSettings {
     int boardThemeIndex = 0; 
     int stoneStyleIndex = 0; 
-    int bgmIndex = 0;
+    int bgmIndex = 0; // <--- NEW: Track selected music
     bool soundEnabled = true;
     bool musicEnabled = true;
     float volume = 50.0f;
-
-    GameMode currentMode = GameMode::PVP;
+    // float bgmvolume = 50.0f;
+    // float effectvolume = 50.0f;
 
     std::string getBoardImagePath() const {
         if (boardThemeIndex == 1) return "assets/img/background/ocean.jpg";
