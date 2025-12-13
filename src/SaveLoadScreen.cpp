@@ -122,7 +122,7 @@ void BaseSlotScreen::updatePreview(int slotId) {
         if (fs::exists(path)) {
             int savedMode = 0;
             int savedDiff = 0;
-            if (m_previewEngine.loadGame(path, savedMode, savedDiff)) {
+            if (m_previewEngine.loadGame(path)) {
                 m_showPreview = true;
                 std::string pName = (m_previewEngine.getCurrentPlayer() == Player::BLACK) ? "Black" : "White";
 

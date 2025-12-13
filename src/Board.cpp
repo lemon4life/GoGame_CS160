@@ -1,6 +1,5 @@
 #include "../include/board.h"
 
-using namespace std;
 //--------PRIVATE FUNCTION DEFINITIONS----------
 //Store and cut branches
 void GoEngine::store_to_history(){
@@ -20,14 +19,14 @@ void GoEngine::delete_branch(int move){
 }
 
 //Automatic State Reassessment
-pair<int, int> GoEngine::spread(int x_coor, int y_coor, int dir){
+std::pair<int, int> GoEngine::spread(int x_coor, int y_coor, int dir){
     int switch_row[4] = {1, -1, 0, 0}, switch_col[4] = {0, 0, 1, -1};
 
     return {x_coor + switch_row[dir], y_coor + switch_col[dir]};
 }
 
 void GoEngine::delete_clump(int x_coor, int y_coor){
-    queue< pair<int, int> > q;
+    std::queue< std::pair<int, int> > q;
     Player ini = board[x_coor][y_coor];
     q.push({x_coor, y_coor});
 
@@ -46,10 +45,10 @@ void GoEngine::delete_clump(int x_coor, int y_coor){
 }
 
 bool GoEngine::check_survivability(int x_coor, int y_coor){
-    queue< pair<int, int> > q;
+    std::queue< std::pair<int, int> > q;
     q.push({x_coor, y_coor});
     int lib_count = 0; Player ini = board[x_coor][y_coor];
-    vector<vector<bool>> vir_board(boardSize+1, vector<bool>(boardSize+1, 0));
+    std::vector<std::vector<bool>> vir_board(boardSize+1, std::vector<bool>(boardSize+1, 0));
     while(!q.empty()){
         auto [x, y] = q.front();
         //cout << x << " " << y << endl;
@@ -89,9 +88,9 @@ bool GoEngine::reassest_board_state(int x, int y, bool& didCaptured){
 //Zobrist Hash and SuperKo construction
 
 void GoEngine::initZobrist(int brd) {
-    mt19937_64 rng(123456); // fixed seed for reproducibility
-    uniform_int_distribution<uint64_t> dist(0, UINT64_MAX);
-    zobristTable = vector<vector<vector<uint64_t>>>(brd+1, vector<vector<uint64_t>>(brd+1, vector<uint64_t>(2, 0)));
+    std::mt19937_64 rng(123456); // fixed seed for reproducibility
+    std::uniform_int_distribution<uint64_t> dist(0, UINT64_MAX);
+    zobristTable = std::vector<std::vector<std::vector<uint64_t>>>(brd+1, std::vector<std::vector<uint64_t>>(brd+1, std::vector<uint64_t>(2, 0)));
     for (int x = 1; x <= brd; ++x) {
         for (int y = 1; y <= brd; ++y) {
             for (int c = 0; c < 2; ++c) {
@@ -137,9 +136,9 @@ void GoEngine::clean_up_dead(){
 
 void GoEngine::initialize_board(int Size){
     boardSize = Size; cur_move = 0; currentPlayer = Player::WHITE;
-    board.clear(); board.assign(Size+1, vector<Player>(Size+1, Player::NONE));
-    zobristTable.clear(); zobristTable.assign(Size+1, vector<vector<uint64_t>>(Size+1, vector<uint64_t>(2, 0)));
-    dead = vector< vector<bool> >(boardSize+1, vector<bool>(boardSize+1, 0));
+    board.clear(); board.assign(Size+1, std::vector<Player>(Size+1, Player::NONE));
+    zobristTable.clear(); zobristTable.assign(Size+1, std::vector<std::vector<uint64_t>>(Size+1, std::vector<uint64_t>(2, 0)));
+    dead = std::vector< std::vector<bool> >(boardSize+1, std::vector<bool>(boardSize+1, 0));
     superkoMap.clear();
     cur_hash = 0;
     history = {};
@@ -185,8 +184,8 @@ bool GoEngine::pass_move(){
     return false;
 }
 
-vector< vector<bool> > GoEngine::validMoves()  {
-    vector< vector<bool> > valid(boardSize+1, vector<bool>(boardSize+1, 0));
+std::vector< std::vector<bool> > GoEngine::validMoves()  {
+    std::vector< std::vector<bool> > valid(boardSize+1, std::vector<bool>(boardSize+1, 0));
 
     for (int i = 1; i <= boardSize; i++) {
         for (int j = 1; j <= boardSize; j++) {
@@ -230,12 +229,12 @@ Player GoEngine::getCurrentPlayer() const{
     return currentPlayer;
 }
 
-vector< vector<Player> > GoEngine::getBoard() const{
+std::vector< std::vector<Player> > GoEngine::getBoard() const{
     return board;
 }
 
 void GoEngine::deadStoneHeuristic(){
-    vector< vector<int> > influence(boardSize+1, vector<int>(boardSize+1, 0));
+    std::vector< std::vector<int> > influence(boardSize+1, std::vector<int>(boardSize+1, 0));
     for(int i = 1; i <= boardSize; i++){
         for(int j = 1; j <= boardSize; j++){
             if(convert_numeral(board[i][j]) == 2) influence[i][j] = 128;
@@ -244,7 +243,7 @@ void GoEngine::deadStoneHeuristic(){
     }
 
     for(int t = 0; t < 5; t++){
-        vector<vector<int> > new_map = influence;
+        std::vector<std::vector<int> > new_map = influence;
         for(int i = 1; i <= boardSize; i++){
             for(int j = 1; j <= boardSize; j++){
                 int Binf = 0, Winf = 0;
@@ -264,7 +263,7 @@ void GoEngine::deadStoneHeuristic(){
     }
 
     for(int t = 0; t < 21; t++){
-        vector< vector<int> > new_map = influence;
+        std::vector< std::vector<int> > new_map = influence;
         for(int i = 1; i <= boardSize; i++) {
             for(int j = 1; j <= boardSize; j++){
                 for(int k = 0; k < 4; k++){
@@ -286,21 +285,21 @@ void GoEngine::deadStoneHeuristic(){
     }
 }
 
-vector< vector<bool> > GoEngine::getDeadState() const  {
+std::vector< std::vector<bool> > GoEngine::getDeadState() const  {
     return dead;
 }
 void GoEngine::toggle_life_death(int x, int y){
     dead[x][y] = dead[x][y] ^ 1;
 }
 
-pair<float, float> GoEngine::calculateScore(){
+std::pair<float, float> GoEngine::calculateScore(){
     clean_up_dead();
-    vector< vector<bool> > checked(boardSize+1, vector<bool>(boardSize+1, 0));
+    std::vector< std::vector<bool> > checked(boardSize+1, std::vector<bool>(boardSize+1, 0));
     float Bpt = 0, Wpt = komi;
     for(int i = 1; i <= boardSize; i++){
         for(int j = 1; j <= boardSize; j++) if(checked[i][j] == 0){
             int cnt = 0; bool Badj = 0, Wadj = 0;
-            queue<pair<int, int>> q;
+            std::queue<std::pair<int, int>> q;
             q.push({i, j});
 
             while(!q.empty()){
@@ -330,7 +329,7 @@ pair<float, float> GoEngine::calculateScore(){
             if(board[i][j] == Player::NONE){
                 if(Badj == 0 && Wadj == 0) continue;
                 if(!Wadj) Bpt += cnt;
-                if(!Badj) Wpt += cnt; 
+                if(!Badj) Wpt += cnt;
             }
         }
     }
@@ -339,27 +338,27 @@ pair<float, float> GoEngine::calculateScore(){
 }
 
 bool GoEngine::saveGame(const std::string& filepath){
-    ofstream outfile(filepath);
+    std::ofstream outfile(filepath);
 
     if (!outfile.is_open()) {
-        cerr << "Error: Could not open file for writing: " << filepath << endl;
+        std::cerr << "Error: Could not open file for writing: " << filepath << std::endl;
         return false;
     }
 
-    outfile << boardSize << endl;
-    outfile << komi << endl;
-    outfile << cur_move << endl;
-    for(int i = 0; i < cur_move; i++) outfile << coorSaver[i].first << " " << coorSaver[i].second << endl;
+    outfile << boardSize << std::endl;
+    outfile << komi << std::endl;
+    outfile << cur_move << std::endl;
+    for(int i = 0; i < cur_move; i++) outfile << coorSaver[i].first << " " << coorSaver[i].second << std::endl;
 
     outfile.close();
     return true;
 }
 
-bool GoEngine::loadGame(const string& filepath){
-    ifstream infile(filepath);
+bool GoEngine::loadGame(const std::string& filepath){
+    std::ifstream infile(filepath);
 
     if(!infile.is_open()){
-        cerr << "Error: Could not open file for reading: " << filepath << endl;
+        std::cerr << "Error: Could not open file for reading: " << filepath << std::endl;
         return false;
     }
 

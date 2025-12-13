@@ -3,24 +3,23 @@
 
 #include <bits/stdc++.h>
 
-using namespace std;
 
 enum class Player { NONE, WHITE, BLACK };
 
 class GoEngine {
 private: 
     std::vector<std::vector<Player>> board;
-    vector< vector<bool> > dead;
+    std::vector< std::vector<bool> > dead;
     int boardSize, consecutivePass; float komi = 6.5;
     Player currentPlayer;
     int cur_move; uint64_t cur_hash;
-    vector<pair<int, int>> coorSaver;
-    vector<vector<vector<uint64_t>>> zobristTable;
-    unordered_map<uint64_t, int> superkoMap;
+    std::vector<std::pair<int, int>> coorSaver;
+    std::vector<std::vector<std::vector<uint64_t>>> zobristTable;
+    std::unordered_map<uint64_t, int> superkoMap;
     struct hist{
-        vector<vector<vector<Player>>> board;
-        vector<uint64_t> cur_hash;
-        vector<int> consecutivePass;
+        std::vector<std::vector<std::vector<Player>>> board;
+        std::vector<uint64_t> cur_hash;
+        std::vector<int> consecutivePass;
     } history;
 
     void switchPlayer();
@@ -29,7 +28,7 @@ private:
     void store_to_history();
     void delete_branch(int move);
 
-    pair<int, int> spread(int x_coor, int y_coor, int dir);
+    std::pair<int, int> spread(int x_coor, int y_coor, int dir);
     void delete_clump(int x_coor, int y_coor);
     bool check_survivability(int x_coor, int y_coor);
 
@@ -50,7 +49,7 @@ public:
     // Returns true if the move was valid and successful
     bool make_move(int x, int y, bool& didCaptured);
     bool pass_move();
-    vector<vector<bool>> validMoves();
+    std::vector<std::vector<bool>> validMoves();
     //Undo/Redo by one move
     //Doesn't handle overflow/underflow states
     bool undo_step();
@@ -60,12 +59,12 @@ public:
     Player getCurrentPlayer() const;
 
     // Returns the state of the board
-    vector< vector<Player> > getBoard() const;
+    std::vector< std::vector<Player> > getBoard() const;
 
     // --- SCORING ---
     // Returns a pair: {BlackScore, WhiteScore}
     void deadStoneHeuristic();
-    vector< vector<bool> > getDeadState() const;
+    std::vector< std::vector<bool> > getDeadState() const;
     void toggle_life_death(int x, int y);
     std::pair<float, float> calculateScore();
 

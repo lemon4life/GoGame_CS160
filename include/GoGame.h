@@ -9,6 +9,8 @@
 
 using namespace std;
 
+
+
 class GoGame {
 private:
     GoEngine engine;
@@ -23,7 +25,10 @@ private:
     Difficulty currentDifficulty;
 
     void setDifficulty(Difficulty level);
+
 public:
+
+
     GoGame(AudioManager& am);
 
     Stone getCurrentPlayer() const;

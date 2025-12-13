@@ -69,7 +69,7 @@ int main() {
     bool whilePlaying = false;
 
     while (window.isOpen()) {
-        if (currentGameState == GameState::PLAYING) game.updateAI();
+        //if (currentGameState == GameState::PLAYING) game.updateAI();
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -99,13 +99,19 @@ int main() {
                             game.resetGame();
                             if (action == "PVP") {
                                 game.setGameMode(GameMode::PVP);
-                                game.setAIDifficulty(AIDifficulty::None);
+                                //game.setDifficulty(Difficulty::NONE);
                             } else {
                                 game.setGameMode(GameMode::AI);
-                                game.initAI("katago.exe", "model.bin.gz", "analysis_example.cfg");
-                                if (action == "AI_EASY") game.setAIDifficulty(AIDifficulty::Easy);
-                                else if (action == "AI_MEDIUM") game.setAIDifficulty(AIDifficulty::Medium);
-                                else if (action == "AI_HARD") game.setAIDifficulty(AIDifficulty::Hard);
+
+                                Difficulty currDif = Difficulty::NONE;
+
+                                if (action == "AI_EASY") currDif = Difficulty::EASY;
+                                else if (action == "AI_MEDIUM") currDif = Difficulty::MEDIUM;
+                                else if (action == "AI_HARD") currDif = Difficulty::HARD;
+
+
+
+                                game.initAI(currDif);
                             }
                             currentGameState = GameState::PLAYING;
                         }

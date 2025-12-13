@@ -12,7 +12,7 @@ Stone playerToStone(Player p) {
     return Stone::Empty;
 }
 
-enum Difficulty { EASY, MEDIUM, HARD, NONE };
+
 
 GoGame::GoGame(AudioManager& am)
     : audio(am), currentMode(GameMode::PVP), isAiThinking(false)
@@ -99,14 +99,14 @@ GameMode GoGame::getGameMode() const {
 
 bool GoGame::saveGame(const std::string& f) {
     // Cast Enums to Int
-    return engine.saveGame(f, (int)currentMode, (int)currentDifficulty);
+    return engine.saveGame(f);
 }
 
 bool GoGame::loadGame(const std::string& f) {
     int modeInt = 0;
     int diffInt = 0;
 
-    if (engine.loadGame(f, modeInt, diffInt)) {
+    if (engine.loadGame(f)) {
         // Convert Ints back to Enums
         currentMode = (modeInt == 1) ? GameMode::AI : GameMode::PVP;
 

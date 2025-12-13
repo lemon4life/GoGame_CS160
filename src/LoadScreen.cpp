@@ -1,59 +1,58 @@
-#include "SaveLoadScreen.h"
-#include <cstdio>
+#include "../include/SaveLoadScreen.h"
+#include <cstdio> // For std::remove
 
 void LoadScreen::updateActionButtonState() {
+    // If no slot is selected, hide the button
     if (m_selectedSlotId == -1) {
         m_showActionBtn = false;
         return;
     }
     m_showActionBtn = true;
 
+    // Check if the selected slot is empty
     bool isEmpty = true;
-    for (const auto& s : m_slots) if (s.id == m_selectedSlotId) isEmpty = s.isEmpty;
-
-    if (isEmpty) {
-        m_actionBtnText.setString("No game was saved here");
-        m_actionBtn.setFillColor(sf::Color(80, 80, 80)); // Grey Disabled
-    } else {
-        m_actionBtnText.setString("Continue Playing");
-        m_actionBtn.setFillColor(sf::Color(50, 150, 50)); // Green
+    for (const auto& s : m_slots) {
+        if (s.id == m_selectedSlotId) isEmpty = s.isEmpty;
     }
 
-    sf::FloatRect textRect = m_actionBtnText.getLocalBounds();
-    m_actionBtnText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top + textRect.height/2.0f);
-    m_actionBtnText.setPosition(
-        m_actionBtn.getPosition().x + m_actionBtn.getSize().x/2.0f,
-        m_actionBtn.getPosition().y + m_actionBtn.getSize().y/2.0f
-    );
+    // Update Button Appearance based on state
+    if (isEmpty) {
+        m_actionBtn->setText("EMPTY SLOT");
+        m_actionBtn->setFillColor(Theme::BtnDisabled); // Grey
+    } else {
+        m_actionBtn->setText("CONTINUE");
+        m_actionBtn->setFillColor(Theme::BtnSuccess); // Green
+    }
 }
 
 int LoadScreen::handleMouseClick(const sf::Vector2i& mousePos) {
-    float mx = static_cast<float>(mousePos.x);
-    float my = static_cast<float>(mousePos.y);
+    // 1. Check Back Button
+    if (m_backButton->isClicked(mousePos)) return -2;
 
-    if (m_backButton.getGlobalBounds().contains(mx, my)) return -2;
-
-    // Action Button (Load)
-    if (m_showActionBtn && m_actionBtn.getGlobalBounds().contains(mx, my)) {
-        // Check empty again to enforce disabled state
+    // 2. Check Action Button (Load Game)
+    if (m_showActionBtn && m_actionBtn->isClicked(mousePos)) {
+        // Double-check emptiness to prevent loading invalid files
         bool isEmpty = true;
-        for (const auto& s : m_slots) if (s.id == m_selectedSlotId) isEmpty = s.isEmpty;
+        for (const auto& s : m_slots) {
+            if (s.id == m_selectedSlotId) isEmpty = s.isEmpty;
+        }
 
-        if (isEmpty) return -1; // Disabled
-
-        return m_selectedSlotId; 
+        if (isEmpty) return -1; // Do nothing if empty
+        return m_selectedSlotId; // Return ID to main.cpp to trigger load
     }
 
+    // 3. Check Slots (Selection & Deletion)
     for (const auto& slot : m_slots) {
-        // Delete
-        if (!slot.isEmpty && slot.delBtn.getGlobalBounds().contains(mx, my)) {
+        // Delete Button (Only active if slot is not empty)
+        if (!slot.isEmpty && slot.delBtn->isClicked(mousePos)) {
             std::remove(getFilePath(slot.id).c_str());
             refreshSlots();
             if (m_selectedSlotId == slot.id) updatePreview(slot.id);
             return -1;
         }
-        // Select
-        if (slot.shape.getGlobalBounds().contains(mx, my)) {
+
+        // Slot Selection Button
+        if (slot.slotBtn->isClicked(mousePos)) {
             updatePreview(slot.id);
             return -1;
         }
