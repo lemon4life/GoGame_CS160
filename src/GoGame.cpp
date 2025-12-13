@@ -1,127 +1,127 @@
 #include "GoGame.h"
 #include "../include/KataGoRunner.h"
+#include <bits/stdc++.h>
 #include <iostream>
+#include <sstream>
 
-// Helper: Convert Engine Player to UI Stone
+using namespace std;
+
 Stone playerToStone(Player p) {
     if (p == Player::BLACK) return Stone::Black;
     if (p == Player::WHITE) return Stone::White;
     return Stone::Empty;
 }
 
-GoGame::GoGame(AudioManager& am) : audio(am) {
-    // Initialize engine with standard size (19x19)
-    // Engine uses 1-based indexing internally
+enum Difficulty { EASY, MEDIUM, HARD, NONE };
+
+GoGame::GoGame(AudioManager& am)
+    : audio(am), currentMode(GameMode::PVP), isAiThinking(false)
+{
     engine.initialize_board(BOARD_SIZE);
 }
 
-//Check for current player
-Stone GoGame::getCurrentPlayer() const {
-    return playerToStone(engine.getCurrentPlayer());
+void GoGame::setGameMode(GameMode mode) {
+    currentMode = mode;
 }
 
-//Check for stone in intersection
+Stone GoGame::getCurrentPlayer() const { return playerToStone(engine.getCurrentPlayer()); }
+
 Stone GoGame::getStoneAt(int x, int y) const {
-    // 1. Check Bounds (UI uses 0-18)
-    if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE)
-        return Stone::Empty;
-
-    // 2. Get Board from Engine
+    if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) return Stone::Empty;
     const auto& b = engine.getBoard();
-
-    // 3. Map Coordinates: UI(x, y) -> Engine(x+1, y+1)
-    Player p = b[x + 1][y + 1];
-
-    return playerToStone(p);
+    return playerToStone(b[x + 1][y + 1]);
 }
 
-//Pass the turn
-bool GoGame::passTurn() {
-    bool isGameOver = engine.pass_move();
-    return isGameOver;
-}
+bool GoGame::placeStone(int x, int y) {
+    // If AI is thinking, block human input
+    if (currentMode == GameMode::AI && isAiThinking) return false;
 
-//Play the move
-int GoGame::placeStone(int x, int y) {
-    // 1. Convert UI Coordinates (0-based) to Engine Coordinates (1-based)
     int engineX = x + 1;
     int engineY = y + 1;
-
-    bool captured;
-
+    bool captured = false;
     bool success = engine.make_move(engineX, engineY, captured);
 
     if (success) {
-        if (captured) {
-            audio.playCapture();
-            return -1;
-        } else {
-            audio.playPlaceStone();
-            return 1;
+        if (captured) audio.playCapture();
+        else audio.playPlaceStone();
+
+        // If VS AI and human (Black) just played, trigger AI (White)
+        if (currentMode == GameMode::AI && engine.getCurrentPlayer() == Player::WHITE) {
+            isAiThinking = true;
+
+            // Convert coordinate to GTP format (e.g., Q16)
+            // This is complex. KataGoRunner::sendCommand handles sending.
+            // But we need to tell KataGo the HUMAN move first.
+            // Assuming KataGo tracks state internally? No, GTP is stateless usually unless we sync.
+            // Actually, we usually send "play B Q16" then "genmove W".
+
+            // For this snippet, I'll assume we call updateAI() in main loop to handle async processing
+            // to avoid freezing the UI.
         }
     } else {
         audio.playError();
     }
-    return 0;
+    return success;
 }
 
-bool GoGame::undo() {
-    if (engine.undo_step()) {
-        audio.playPlaceStone();
+bool GoGame::isAIThinking() const {
+    return isAiThinking;
+}
+
+bool GoGame::passTurn() { return engine.pass_move(); }
+bool GoGame::undo() { return engine.undo_step(); }
+bool GoGame::redo() { return engine.redo_step(); }
+void GoGame::resetGame() { engine.initialize_board(BOARD_SIZE); }
+
+Difficulty GoGame::getAIDifficulty() const {
+    return currentDifficulty;
+}
+
+GameMode GoGame::getGameMode() const {
+    return currentMode;
+}
+
+bool GoGame::saveGame(const std::string& f) {
+    // Cast Enums to Int
+    return engine.saveGame(f, (int)currentMode, (int)currentDifficulty);
+}
+
+bool GoGame::loadGame(const std::string& f) {
+    int modeInt = 0;
+    int diffInt = 0;
+
+    if (engine.loadGame(f, modeInt, diffInt)) {
+        // Convert Ints back to Enums
+        currentMode = (modeInt == 1) ? GameMode::AI : GameMode::PVP;
+
+        if (diffInt == 1) currentDifficulty = Difficulty::EASY;
+        else if (diffInt == 2) currentDifficulty = Difficulty::MEDIUM;
+        else if (diffInt == 3) currentDifficulty = Difficulty::HARD;
+        else currentDifficulty = Difficulty::NONE;
+
         return true;
-    } else {
-        audio.playError();
-        return false;
     }
+    return false;
 }
 
-bool GoGame::redo() {
-    if (engine.redo_step()) {
-        audio.playPlaceStone();
-        return true;
-    } else {
-        audio.playError();
-        return false;
-    }
-}
-
-void GoGame::resetGame() {
-    engine.initialize_board(BOARD_SIZE);
-}
-
-bool GoGame::saveGame(const std::string& filename) {
-    return engine.saveGame(filename);
-}
-
-bool GoGame::loadGame(const std::string& filename) {
-    return engine.loadGame(filename);
-}
-
-std::pair<float, float> GoGame::getScore() {
-    return engine.calculateScore();
-}
-
-void GoGame::toggleDeadStone(int x, int y) {
-    // Map UI (0-18) to Engine (1-19)
-    int engineX = x + 1;
-    int engineY = y + 1;
-    engine.toggle_life_death(engineX, engineY);
-}
-
-//Zobrist's Algorithm
-void GoGame::runHeuristic() {
-    engine.deadStoneHeuristic();
-}
-
+std::pair<float, float> GoGame::getScore() { return engine.calculateScore(); }
+void GoGame::toggleDeadStone(int x, int y) { engine.toggle_life_death(x + 1, y + 1); }
 std::vector<std::vector<bool>> GoGame::getDeadStones() const {
-    return engine.getDeadState();
+    auto rawDead = const_cast<GoEngine*>(&engine)->getDeadState();
+    std::vector<std::vector<bool>> uiDead(BOARD_SIZE, std::vector<bool>(BOARD_SIZE, false));
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+        for (int j = 0; j < BOARD_SIZE; ++j) {
+             if (i+1 < rawDead.size() && j+1 < rawDead[i+1].size())
+                uiDead[i][j] = rawDead[i + 1][j + 1];
+        }
+    }
+    return uiDead;
 }
-
 std::vector<std::vector<bool>> GoGame::getValidMoves() const {
     return const_cast<GoEngine&>(engine).validMoves();
 }
 
-void GoGame::initAI() {
+void GoGame::initAI(Difficulty level) {
     // 2. Start the process. 
     // IMPORTANT: These paths are relative to where the .exe runs (your project root usually).
     bool isRunning = bot.startEngine("./AI/katago.exe", "./AI/model.bin.gz", "./AI/cpu_config.cfg");
@@ -145,6 +145,9 @@ void GoGame::initAI() {
     
     // Clear the board (Good practice to ensure a clean state)
     bot.sendCommand("clear_board");
+
+    setDifficulty(level);
+    currentDifficulty = level;
 }
 
 string GoGame::convertToGTP(int x, int y){
@@ -188,6 +191,7 @@ void GoGame::handleHumanMove(int x, int y, Player side) {
 }
 
 void GoGame::doAITurn(Player side, int &x, int &y) {
+    isAiThinking = true;
     // 1. Ask for a move (White)
     std::string response; 
     if(side == Player::WHITE) response = bot.sendCommand("genmove W");
@@ -216,4 +220,32 @@ void GoGame::doAITurn(Player side, int &x, int &y) {
     convertFromGTP(move, aiX, aiY);
 
     x = aiX; y = aiY;
+    isAiThinking = false;
+}
+
+void GoGame::setDifficulty(Difficulty level) {
+    string visits;
+    
+    switch(level) {
+        case EASY:
+            // Very fast, "weaker" (still strong)
+            visits = "3"; 
+            break;
+        case MEDIUM:
+            // Good balance of speed and strength
+            visits = "10"; 
+            break;
+        case HARD:
+            // "100%" capability (within reasonable waiting time)
+            visits = "100"; 
+            break;
+    }
+
+    // "kata-set-param" is a special KataGo command to change config on the fly
+    std::string command = "kata-set-param maxVisits " + visits;
+    
+    // Send it! (Ignore the response, it's usually just success)
+    bot.sendCommand(command);
+    
+    std::cout << "Difficulty set to " << visits << " visits." << std::endl;
 }
