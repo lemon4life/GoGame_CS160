@@ -179,7 +179,7 @@ void BaseSlotScreen::drawPreviewBoard(sf::RenderWindow& window, const StoneTextu
             Player p = board[x][y];
             if (p == Player::NONE) continue;
 
-            if (p == Player::BLACK) stone.setTexture(blackTex);
+            if (p == Player::WHITE) stone.setTexture(blackTex);
             else stone.setTexture(whiteTex);
 
             stone.setPosition(PREVIEW_X + x * cellSize, PREVIEW_Y + y * cellSize);

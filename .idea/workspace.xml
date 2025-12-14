@@ -30,7 +30,6 @@
   <component name="ChangeListManager">
     <list default="true" id="636f3ced-f93e-4f22-b12f-0c998a41f57e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameRenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameRenderer.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +139,7 @@
       <workItem from="1765593496668" duration="4862000" />
       <workItem from="1765618104172" duration="3509000" />
       <workItem from="1765628282488" duration="7000" />
-      <workItem from="1765696210646" duration="11361000" />
+      <workItem from="1765696210646" duration="13112000" />
     </task>
     <task id="LOCAL-00001">
       <option name="closed" value="true" />
