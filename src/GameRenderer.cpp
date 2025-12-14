@@ -4,6 +4,7 @@
 #include <string>
 
 namespace GameRenderer {
+
     static sf::RenderTexture cachedBoard;
     static sf::Sprite cachedBoardSprite;
     static int cachedThemeIndex = -1;
@@ -108,11 +109,11 @@ namespace GameRenderer {
     void drawStones(sf::RenderWindow& window, const GoGame& game, const StoneTextureManager& tm, const GameSettings& settings) {
         static sf::Sprite stoneSprite;
 
-        // Pre-fetch texture pointers
+        // Pre-fetch texture pointers to avoid lookups
         const sf::Texture* blackTex = &tm.getTexture(Stone::Black, settings.stoneStyleIndex);
         const sf::Texture* whiteTex = &tm.getTexture(Stone::White, settings.stoneStyleIndex);
 
-        // Track the currently applied texture to avoid redundant calculations
+        // We use a pointer to track the current texture so we don't re-set it unnecessarily
         const sf::Texture* currentTex = nullptr;
 
         for (int y = 0; y < BOARD_SIZE; ++y) {
@@ -120,19 +121,22 @@ namespace GameRenderer {
                 Stone s = game.getStoneAt(x, y);
                 if (s == Stone::Empty) continue;
 
-                // Determine which texture we need
+                // 1. Determine which texture to use
                 const sf::Texture* neededTex = (s == Stone::White) ? blackTex : whiteTex;
 
-                // Only update Sprite properties if the texture actually changes
+                // 2. Only update sprite properties if texture changed
                 if (currentTex != neededTex) {
                     currentTex = neededTex;
-                    stoneSprite.setTexture(*currentTex);
+                    stoneSprite.setTexture(*currentTex,true);
 
-                    // --- FIX: Recalculate Scale & Origin based on THIS texture's size ---
+                    // --- FIX: Calculate Scale & Origin based on THIS texture's size ---
                     sf::Vector2u texSize = currentTex->getSize();
-                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
 
-                    stoneSprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f); // Center exactly
+                    // Origin should be the center of the image
+                    stoneSprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
+
+                    // Scale should fit the image into the cell (STONE_RADIUS * 2)
+                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
                     stoneSprite.setScale(scaleFactor, scaleFactor);
                 }
 
@@ -152,24 +156,26 @@ namespace GameRenderer {
                 if (validMoves[gx + 1][gy + 1]) {
                     Stone currentPlayer = game.getCurrentPlayer();
 
+                    // Determine ghost texture
                     const sf::Texture* ghostTex = (currentPlayer == Stone::Black) ? blackTex : whiteTex;
 
-                    // Apply texture and recalculate for ghost
-                    stoneSprite.setTexture(*ghostTex);
-                    sf::Vector2u texSize = ghostTex->getSize();
-                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
+                    // Apply and recalculate scale/origin for ghost
+                    stoneSprite.setTexture(*ghostTex, true);
 
+                    sf::Vector2u texSize = ghostTex->getSize();
                     stoneSprite.setOrigin(texSize.x / 2.0f, texSize.y / 2.0f);
+                    float scaleFactor = (STONE_RADIUS * 2.0f) / texSize.x;
                     stoneSprite.setScale(scaleFactor, scaleFactor);
 
-                    stoneSprite.setColor(sf::Color(255, 255, 255, 128));
+                    stoneSprite.setColor(sf::Color(255, 255, 255, 128)); // Transparent
                     stoneSprite.setPosition(toScreenCoord(gx, gy));
 
                     window.draw(stoneSprite);
 
-                    // Reset color
+                    // Reset color for next frame
                     stoneSprite.setColor(sf::Color::White);
-                    // Reset tracker so next frame doesn't assume wrong texture
+
+                    // Reset tracker so loop doesn't assume wrong state next time
                     currentTex = nullptr;
                 }
             }
