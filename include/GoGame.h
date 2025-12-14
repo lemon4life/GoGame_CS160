@@ -23,7 +23,7 @@ private:
     bool isAiThinking;
     Difficulty currentDifficulty;
 
-
+    int getTerritoryOwner(int x, int y);
 
 public:
     GoGame(AudioManager& am);
@@ -47,8 +47,8 @@ public:
     Difficulty getAIDifficulty() const;
     GameMode getGameMode() const;
 
-    bool saveGame(const std::string& filename);
-    bool loadGame(const std::string& filename);
+    bool saveGame(const std::string& filename, const std::string& mode);
+    bool loadGame(const std::string& filename, std::string& mode);
 
     std::pair<float, float> getScore();
     void toggleDeadStone(int x, int y);
@@ -61,4 +61,6 @@ public:
     void doAITurn(int &x, int &y);
 
     std::vector<std::vector<bool>> getValidMoves() const;
+
+    std::pair<float, float> calculateExactScore();
 };

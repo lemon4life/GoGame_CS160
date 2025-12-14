@@ -67,7 +67,13 @@ bool GoGame::passTurn() {
 bool GoGame::undo() {
     if (engine.undo_step()) {
         audio.playPlaceStone();
-        if (currentMode == GameMode::AI) bot.sendCommand("undo");
+        if (currentMode == GameMode::AI) {
+            bot.sendCommand("undo");
+            if (engine.undo_step()){
+                audio.playPlaceStone();
+                bot.sendCommand("undo");
+            }
+        }
         return true;
     }
 
@@ -76,8 +82,21 @@ bool GoGame::undo() {
 }
 
 bool GoGame::redo() {
-    if (engine.redo_step()) {
+    int x = 0, y = 0; string player;
+    if (engine.redo_step(x, y, player)) {
         audio.playPlaceStone();
+
+        if (currentMode == GameMode::AI) {
+            std::string coord = convertToGTP(x, y);
+            bot.sendCommand("play " + player + " " + coord);
+            std::cout << "play " << player << " " << coord << std::endl;
+            if (engine.redo_step(x, y, player)) {
+                audio.playPlaceStone();
+                coord = convertToGTP(x, y);
+                bot.sendCommand("play " + player + " " + coord);
+                std::cout << "play " << player << " " << coord << std::endl;
+            }
+        }
         return true;
     }
 
@@ -100,12 +119,12 @@ GameMode GoGame::getGameMode() const {
     return currentMode;
 }
 
-bool GoGame::saveGame(const std::string& f) {
-    return engine.saveGame(f);
+bool GoGame::saveGame(const std::string& f, const std::string& mode) {
+    return engine.saveGame(f, mode);
 }
 
-bool GoGame::loadGame(const std::string& f) {
-    if (engine.loadGame(f)) {
+bool GoGame::loadGame(const std::string& f, std::string& mode) {
+    if (engine.loadGame(f, mode)) {
         return true;
     }
     return false;

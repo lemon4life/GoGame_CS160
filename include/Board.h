@@ -53,7 +53,7 @@ public:
     //Undo/Redo by one move
     //Doesn't handle overflow/underflow states
     bool undo_step();
-    bool redo_step();
+    bool redo_step(int& x, int& y, std::string& player);
 
     // Returns the current player
     Player getCurrentPlayer() const;
@@ -69,8 +69,8 @@ public:
     std::pair<float, float> calculateScore();
 
     // --- SAVE/LOAD ---
-    bool saveGame(const std::string& filepath);
-    bool loadGame(const std::string& filepath);
+    bool saveGame(const std::string& filepath, const std::string& mode);
+    bool loadGame(const std::string& filepath, std::string& mode);
 };
 
 #endif
