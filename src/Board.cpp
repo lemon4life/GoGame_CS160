@@ -1,4 +1,5 @@
 #include "../include/board.h"
+#include "KataGoRunner.h" // Your AI connector class
 
 //--------PRIVATE FUNCTION DEFINITIONS----------
 //Store and cut branches
@@ -150,6 +151,7 @@ void GoEngine::initialize_board(int Size){
 
 bool GoEngine::make_move(int x, int y, bool& didCaptured){
     cur_move++;
+    std::cerr << cur_move << std::endl;
     didCaptured = 0;
     switchPlayer();
     if(board[x][y] != Player::NONE) {
@@ -175,6 +177,7 @@ bool GoEngine::make_move(int x, int y, bool& didCaptured){
 
 bool GoEngine::pass_move(){
     cur_move++;
+    std::cerr << cur_move << std::endl;
     switchPlayer();
     delete_branch(cur_move);
     store_to_history();
@@ -233,56 +236,111 @@ std::vector< std::vector<Player> > GoEngine::getBoard() const{
     return board;
 }
 
+std::string toGTPCoordinate(int x, int y) {
+    if (x < 1 || x > 19 || y < 1 || y > 19) return "PASS";
+
+    std::string coord = "";
+
+    // Convert X (1-19) to Letter (A-T, skipping I)
+    // 1=A, 8=H, 9=J (skip I), ...
+    char xChar = 'A' + (x - 1);
+    if (x >= 9) xChar++; // Skip 'I'
+    coord += xChar;
+
+    // Convert Y (1-19) to String
+    coord += std::to_string(y);
+
+    return coord;
+}
+
 void GoEngine::deadStoneHeuristic(){
-    std::vector< std::vector<int> > influence(boardSize+1, std::vector<int>(boardSize+1, 0));
-    for(int i = 1; i <= boardSize; i++){
-        for(int j = 1; j <= boardSize; j++){
-            if(convert_numeral(board[i][j]) == 2) influence[i][j] = 128;
-            if(convert_numeral(board[i][j]) == 1) influence[i][j] = -128;
-        }
+    std::cout << "--- Calculating Life & Death (Initializing Temp AI) ---" << std::endl;
+
+    // 1. Initialize a separate, temporary bot instance
+    KataGoRunner tempBot;
+
+    // Use the relative paths that we know work
+    bool started = tempBot.startEngine("./AI/katago.exe", "./AI/model.txt.gz", "./AI/cpu_config.cfg");
+
+    if (!started) {
+        std::cerr << "[Error] Could not start temp AI for heuristic." << std::endl;
+        return;
     }
 
-    for(int t = 0; t < 5; t++){
-        std::vector<std::vector<int> > new_map = influence;
-        for(int i = 1; i <= boardSize; i++){
-            for(int j = 1; j <= boardSize; j++){
-                int Binf = 0, Winf = 0;
-                for(int k = 0; k < 4; k++){
-                    auto [xn, yn] = spread(i, j, k);
-                    if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
-                        if(influence[xn][yn] > 0) Binf++;
-                        else if(influence[xn][yn] < 0) Winf++;
-                    }
-                }
-                if(Binf == 0) new_map[i][j] -= Winf;
-                if(Winf == 0) new_map[i][j] += Binf;
+    // 2. Setup the "Physics" of the board
+    tempBot.sendCommand("boardsize 19");
+    tempBot.sendCommand("komi 6.5");
+    tempBot.sendCommand("clear_board");
+
+    // 3. Reconstruct the board state from your 2D vector
+    // looping 1 to 19 (Base-1)
+    for (int x = 1; x <= 19; x++) {
+        for (int y = 1; y <= 19; y++) {
+            // Reset dead status to 0 (alive) initially
+            dead[x][y] = false;
+
+            if (board[x][y] == Player::BLACK) {
+                tempBot.sendCommand("play B " + toGTPCoordinate(x, y));
+            }
+            else if (board[x][y] == Player::WHITE) {
+                tempBot.sendCommand("play W " + toGTPCoordinate(x, y));
             }
         }
-        influence = new_map;
-
     }
 
-    for(int t = 0; t < 21; t++){
-        std::vector< std::vector<int> > new_map = influence;
-        for(int i = 1; i <= boardSize; i++) {
-            for(int j = 1; j <= boardSize; j++){
-                for(int k = 0; k < 4; k++){
-                    auto [xn, yn] = spread(i, j, k);
-                    if(xn > 0 && yn > 0 && xn <= boardSize && yn <= boardSize){
-                        if(influence[i][j] > 0 && influence[xn][yn] <= 0 && new_map[i][j] > 0) new_map[i][j]--;
-                        else if(influence[i][j] < 0 && influence[xn][yn] >= 0 && new_map[i][j] < 0) new_map[i][j]++;
-                    }
-                }
-            }
+    // 4. Ask the Oracle what is dead
+    std::string response = tempBot.sendCommand("final_status_list dead");
+
+    // Response format is usually: "= A1 B2 C5\n\n"
+    // We need to clean it up.
+
+    // Remove the leading "= " if present
+    size_t equalPos = response.find("=");
+    if (equalPos != std::string::npos) {
+        response = response.substr(equalPos + 1);
+    }
+
+    // 5. Parse the list of coordinates
+    std::stringstream ss(response);
+    std::string segment;
+
+    while (std::getline(ss, segment, ' ')) {
+        // Trim whitespace (newlines/spaces)
+        segment.erase(0, segment.find_first_not_of(" \n\r\t"));
+        segment.erase(segment.find_last_not_of(" \n\r\t") + 1);
+
+        if (segment.length() < 2) continue; // Skip empty garbage
+
+        // Convert GTP (e.g., "Q16") back to X,Y (Base-1)
+        char colChar = std::toupper(segment[0]);
+        int x = 0;
+        int y = 0;
+
+        // Parse X
+        if (colChar >= 'A' && colChar <= 'H') {
+            x = colChar - 'A' + 1; // A=1
+        } else if (colChar >= 'J' && colChar <= 'T') {
+            x = colChar - 'A'; // J(9) -> 9. 'J' is 10th letter, -1 shift for I.
         }
-        influence = new_map;
 
+        // Parse Y
+        try {
+            y = std::stoi(segment.substr(1));
+        } catch (...) { continue; }
+
+        // 6. Update the 'dead' vector
+        if (x >= 1 && x <= 19 && y >= 1 && y <= 19) {
+            dead[x][y] = true;
+            // Optional: Debug print
+            std::cout << "Stone at " << x << "," << y << " is DEAD." << std::endl;
+        }
     }
-
-
-    for(int i = 1; i <= boardSize; i++){
-        for(int j = 1; j <= boardSize; j++) if((convert_numeral(board[i][j]) == 2 && influence[i][j] < 0) || (convert_numeral(board[i][j]) == 1 && influence[i][j] > 0)) dead[i][j] = 1;
+    for (int i = 1; i <= 19; i++) {
+        for (int j = 1; j <= 19; j++) std::cout << dead[i][j] << " ";
+        std::cout << std::endl;
     }
+    std::cout << "--- Life & Death Calculation Complete ---" << std::endl;
+    // tempBot is destroyed here automatically, closing the pipe.
 }
 
 std::vector< std::vector<bool> > GoEngine::getDeadState() const  {
@@ -293,6 +351,7 @@ void GoEngine::toggle_life_death(int x, int y){
 }
 
 std::pair<float, float> GoEngine::calculateScore(){
+    deadStoneHeuristic();
     clean_up_dead();
     std::vector< std::vector<bool> > checked(boardSize+1, std::vector<bool>(boardSize+1, 0));
     float Bpt = 0, Wpt = komi;
@@ -324,16 +383,17 @@ std::pair<float, float> GoEngine::calculateScore(){
                 //cout << endl;
             }
 
-            if(board[i][j] == Player::BLACK) Bpt += cnt;
-            if(board[i][j] == Player::WHITE) Wpt += cnt;
+            if(board[i][j] == Player::BLACK) Wpt += cnt;
+            if(board[i][j] == Player::WHITE) Bpt += cnt;
             if(board[i][j] == Player::NONE){
                 if(Badj == 0 && Wadj == 0) continue;
-                if(!Wadj) Bpt += cnt;
-                if(!Badj) Wpt += cnt;
+                if(!Wadj) Wpt += cnt;
+                if(!Badj) Bpt += cnt;
             }
+            std::cout << i << " " << j << ": " << Bpt << " " << Wpt << " " << Wadj << " " << Badj << std::endl;
         }
     }
-    //cout << komi << endl;
+    std::cout << Bpt << " " << Wpt << std::endl;
     return {Bpt, Wpt};
 }
 
