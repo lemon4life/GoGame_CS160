@@ -218,13 +218,19 @@ bool GoEngine::undo_step(){
     return true;
 }
 
-bool GoEngine::redo_step(){
+bool GoEngine::redo_step(int& x, int& y, std::string& player){
     if(cur_move == history.board.size() - 1) return false;
     cur_move++;
+    if (cur_move % 2 == 1) player = "B";
+    else player = "W";
     switchPlayer();
     cur_hash = history.cur_hash[cur_move]; superkoMap[cur_hash]++;
     board = history.board[cur_move];
     consecutivePass = history.consecutivePass[cur_move];
+    std::tie(x, y) = coorSaver[cur_move-1];
+    x--;
+    y--;
+    std::cout << x << " " << y << std::endl;
     return true;
 }
 
@@ -397,14 +403,14 @@ std::pair<float, float> GoEngine::calculateScore(){
     return {Bpt, Wpt};
 }
 
-bool GoEngine::saveGame(const std::string& filepath){
+bool GoEngine::saveGame(const std::string& filepath, const std::string& mode){
     std::ofstream outfile(filepath);
 
     if (!outfile.is_open()) {
         std::cerr << "Error: Could not open file for writing: " << filepath << std::endl;
         return false;
     }
-
+    outfile << mode << std::endl;
     outfile << boardSize << std::endl;
     outfile << komi << std::endl;
     outfile << cur_move << std::endl;
@@ -414,14 +420,14 @@ bool GoEngine::saveGame(const std::string& filepath){
     return true;
 }
 
-bool GoEngine::loadGame(const std::string& filepath){
+bool GoEngine::loadGame(const std::string& filepath, std::string& mode){
     std::ifstream infile(filepath);
 
     if(!infile.is_open()){
         std::cerr << "Error: Could not open file for reading: " << filepath << std::endl;
         return false;
     }
-
+    infile >> mode;
     infile >> boardSize;
     initialize_board(boardSize);
     infile >> komi;
