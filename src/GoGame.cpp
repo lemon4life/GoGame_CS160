@@ -159,6 +159,28 @@ string GoGame::convertToGTP(int x, int y){
 }
 
 void GoGame::convertFromGTP(std::string gtp, int &x, int &y) {
+    std::string command = gtp;
+    for (char &c : command) c = std::toupper(c);
+
+    // --- FIX STARTS HERE ---
+    // Handle PASS (-1, -1)
+    if (command == "PASS") {
+        x = -1;
+        y = -1;
+        std::cout << "AI Action: PASS" << std::endl;
+        return; // Stop here! Don't try to parse coordinates.
+    }
+
+    // Handle RESIGN (-2, -2)
+    if (command == "RESIGN") {
+        x = -2;
+        y = -2;
+        std::cout << "AI Action: RESIGN" << std::endl;
+        return; // Stop here!
+    }
+    // --- FIX ENDS HERE ---
+
+    // The rest of your original logic follows...
     if (gtp.length() < 2) return;
 
     char colChar = std::toupper(gtp[0]);
@@ -177,6 +199,7 @@ void GoGame::convertFromGTP(std::string gtp, int &x, int &y) {
     } catch (...) {
         y = 0;
     }
+    std::cout << x << " " << y << std::endl;
 }
 
 // simplified handleHumanMove
@@ -224,3 +247,4 @@ void GoGame::setDifficulty(Difficulty level) {
     currentDifficulty = level;
     std::cout << "Difficulty set to " << visits << " visits." << std::endl;
 }
+
