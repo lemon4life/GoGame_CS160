@@ -230,7 +230,7 @@ bool GoEngine::redo_step(int& x, int& y, std::string& player){
     std::tie(x, y) = coorSaver[cur_move-1];
     x--;
     y--;
-    std::cout << x << " " << y << std::endl;
+    //std::cout << x << " " << y << std::endl;
     return true;
 }
 
@@ -338,13 +338,10 @@ void GoEngine::deadStoneHeuristic(){
         if (x >= 1 && x <= 19 && y >= 1 && y <= 19) {
             dead[x][y] = true;
             // Optional: Debug print
-            std::cout << "Stone at " << x << "," << y << " is DEAD." << std::endl;
+            //std::cout << "Stone at " << x << "," << y << " is DEAD." << std::endl;
         }
     }
-    for (int i = 1; i <= 19; i++) {
-        for (int j = 1; j <= 19; j++) std::cout << dead[i][j] << " ";
-        std::cout << std::endl;
-    }
+
     std::cout << "--- Life & Death Calculation Complete ---" << std::endl;
     // tempBot is destroyed here automatically, closing the pipe.
 }
@@ -396,10 +393,10 @@ std::pair<float, float> GoEngine::calculateScore(){
                 if(!Wadj) Wpt += cnt;
                 if(!Badj) Bpt += cnt;
             }
-            std::cout << i << " " << j << ": " << Bpt << " " << Wpt << " " << Wadj << " " << Badj << std::endl;
+            //std::cout << i << " " << j << ": " << Bpt << " " << Wpt << " " << Wadj << " " << Badj << std::endl;
         }
     }
-    std::cout << Bpt << " " << Wpt << std::endl;
+    //std::cout << Bpt << " " << Wpt << std::endl;
     return {Bpt, Wpt};
 }
 

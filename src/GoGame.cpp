@@ -255,15 +255,35 @@ void GoGame::doAITurn(int &x, int &y) {
 }
 
 void GoGame::setDifficulty(Difficulty level) {
-    string visits;
+    std::string visits;
+    std::string temp; // New variable for temperature
+
     switch(level) {
-        case Difficulty::EASY: visits = "3"; break;
-        case Difficulty::MEDIUM: visits = "25"; break;
-        case Difficulty::HARD: visits = "100"; break;
-        default: visits = "10"; break;
+        case Difficulty::EASY:
+            visits = "3";
+            temp = "1.0"; // High randomness (makes mistakes)
+            break;
+        case Difficulty::MEDIUM:
+            visits = "10";
+            temp = "0.5"; // Moderate randomness
+            break;
+        case Difficulty::HARD:
+            visits = "100";
+            temp = "0.0"; // Zero randomness (pure best move)
+            break;
+        default:
+            visits = "10";
+            temp = "0.5";
+            break;
     }
+
+    // Command 1: Set Thinking Power
     bot.sendCommand("kata-set-param maxVisits " + visits);
+
+    // Command 2: Set Randomness (Temperature)
+    bot.sendCommand("kata-set-param chosenMoveTemperature " + temp);
+
     currentDifficulty = level;
-    std::cout << "Difficulty set to " << visits << " visits." << std::endl;
+    std::cout << "Difficulty set to " << visits << " visits, Temp " << temp << std::endl;
 }
 
