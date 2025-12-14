@@ -23,7 +23,7 @@ const int BUTTON_START_Y_GAME_UI = GRID_OFFSET;
 enum class Stone { Empty, White, Black };
 enum class GameState { MENU, PLAYING, SETTINGS, EXIT, SAVE_MENU, LOAD_MENU,  GAME_OVER, SCORING, NEW_GAME_MENU};
 enum class GameMode {PVP, AI};
-enum Difficulty { EASY, MEDIUM, HARD, NONE };
+enum Difficulty {NONE, EASY, MEDIUM, HARD };
 
 // Structs
 struct Move {

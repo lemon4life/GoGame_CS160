@@ -120,19 +120,17 @@ void BaseSlotScreen::updatePreview(int slotId) {
         std::string path = getFilePath(slotId);
 
         if (fs::exists(path)) {
-            int savedMode = 0;
-            int savedDiff = 0;
-            if (m_previewEngine.loadGame(path)) {
+            Difficulty savedMode = Difficulty::NONE;
+            if (m_previewEngine.loadGame(path, savedMode)) {
                 m_showPreview = true;
                 std::string pName = (m_previewEngine.getCurrentPlayer() == Player::BLACK) ? "Black" : "White";
 
                 std::string modeStr = "2-Player";
-                if (savedMode == 1) {
-                    if (savedDiff == 1) modeStr = "AI (Easy)";
-                    else if (savedDiff == 2) modeStr = "AI (Medium)";
-                    else if (savedDiff == 3) modeStr = "AI (Hard)";
-                    else modeStr = "AI";
-                }
+
+                if (savedMode == Difficulty::EASY) modeStr = "AI (Easy)";
+                else if (savedMode == Difficulty::MEDIUM) modeStr = "AI (Medium)";
+                else if (savedMode == Difficulty::HARD) modeStr = "AI (Hard)";
+
                 m_infoText.setString("Mode: " + modeStr + " | Turn: " + pName);
             }
         } else {

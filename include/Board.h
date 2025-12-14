@@ -2,6 +2,7 @@
 #define GO_ENGINE_H
 
 #include <bits/stdc++.h>
+#include "Definitions.h"
 
 
 enum class Player { NONE, WHITE, BLACK };
@@ -69,8 +70,8 @@ public:
     std::pair<float, float> calculateScore();
 
     // --- SAVE/LOAD ---
-    bool saveGame(const std::string& filepath, const std::string& mode);
-    bool loadGame(const std::string& filepath, std::string& mode);
+    bool saveGame(const std::string& filepath, Difficulty mode);
+    bool loadGame(const std::string& filepath, Difficulty &mode);
 };
 
 #endif

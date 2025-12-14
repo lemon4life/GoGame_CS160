@@ -47,8 +47,8 @@ public:
     Difficulty getAIDifficulty() const;
     GameMode getGameMode() const;
 
-    bool saveGame(const std::string& filename, const std::string& mode);
-    bool loadGame(const std::string& filename, std::string& mode);
+    bool saveGame(const std::string& filename, Difficulty mode);
+    bool loadGame(const std::string& filename, Difficulty& mode);
 
     std::pair<float, float> getScore();
     void toggleDeadStone(int x, int y);

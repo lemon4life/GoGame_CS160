@@ -119,11 +119,11 @@ GameMode GoGame::getGameMode() const {
     return currentMode;
 }
 
-bool GoGame::saveGame(const std::string& f, const std::string& mode) {
+bool GoGame::saveGame(const std::string& f, Difficulty mode) {
     return engine.saveGame(f, mode);
 }
 
-bool GoGame::loadGame(const std::string& f, std::string& mode) {
+bool GoGame::loadGame(const std::string& f, Difficulty &mode) {
     if (engine.loadGame(f, mode)) {
         return true;
     }

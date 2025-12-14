@@ -152,6 +152,7 @@ int main() {
                             game.resetGame();
                             if (action == "PVP") {
                                 game.setGameMode(GameMode::PVP);
+                                game.setDifficulty(Difficulty::NONE);
                             } else {
                                 game.setGameMode(GameMode::AI);
 
@@ -221,7 +222,8 @@ int main() {
                         int action = saveScreen.handleMouseClick(mousePos);
                         if (action == -2) currentGameState = (whilePlaying ? GameState::PLAYING : GameState::MENU);
                         else if (action > 0) {
-                            if (game.saveGame("saves/save_0" + std::to_string(action) + ".txt"))
+
+                            if (game.saveGame("saves/save_0" + std::to_string(action) + ".txt", game.getAIDifficulty()))
                                 ui.setNotification("Game Saved!");
                             currentGameState = GameState::PLAYING;
                         }
@@ -232,11 +234,27 @@ int main() {
                         int action = loadScreen.handleMouseClick(mousePos);
                         if (action == -2) currentGameState = (whilePlaying ? GameState::PLAYING : GameState::MENU);
                         else if (action > 0) {
-                            if (game.loadGame("saves/save_0" + std::to_string(action) + ".txt")) {
+                            Difficulty currDif = Difficulty::NONE;
+                            if (game.loadGame("saves/save_0" + std::to_string(action) + ".txt", currDif)) {
                                 ui.setNotification("Game Loaded!");
+
+                                if (currDif == Difficulty::NONE) {
+                                    game.setGameMode(GameMode::PVP);
+                                    game.setDifficulty(Difficulty::NONE);
+                                } else {
+                                    game.setGameMode(GameMode::AI);
+                                    //game.initAI("./AI/katago.exe", "./AI/model.txt.gz", "./AI/cpu_config.cfg");
+                                    game.setDifficulty(currDif);
+                                }
+
+
+                                // Initialize AI with paths
+
                                 currentGameState = GameState::PLAYING;
                                 whilePlaying = true;
                             }
+
+
                         }
                         break;
                     }

@@ -403,7 +403,12 @@ std::pair<float, float> GoEngine::calculateScore(){
     return {Bpt, Wpt};
 }
 
-bool GoEngine::saveGame(const std::string& filepath, const std::string& mode){
+//0: PVP
+//1: Easy
+//2: Medium
+//3: Hard
+
+bool GoEngine::saveGame(const std::string& filepath, Difficulty mode){
     std::ofstream outfile(filepath);
 
     if (!outfile.is_open()) {
@@ -420,14 +425,22 @@ bool GoEngine::saveGame(const std::string& filepath, const std::string& mode){
     return true;
 }
 
-bool GoEngine::loadGame(const std::string& filepath, std::string& mode){
+bool GoEngine::loadGame(const std::string& filepath, Difficulty &mode){
     std::ifstream infile(filepath);
 
     if(!infile.is_open()){
         std::cerr << "Error: Could not open file for reading: " << filepath << std::endl;
         return false;
     }
-    infile >> mode;
+
+    int temp;
+    infile >> temp;
+
+    if (temp == 0) mode = Difficulty::NONE;
+    if (temp == 1) mode = Difficulty::EASY;
+    if (temp == 2) mode = Difficulty::MEDIUM;
+    if (temp == 3) mode = Difficulty::HARD;
+
     infile >> boardSize;
     initialize_board(boardSize);
     infile >> komi;
