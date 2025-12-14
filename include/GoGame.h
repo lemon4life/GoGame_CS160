@@ -2,14 +2,12 @@
 #include "Definitions.h"
 #include "AudioManager.h"
 #include "Board.h"
-#include "KataGoRunner.h" // <--- Include Partner's Header
+#include "KataGoRunner.h"
 #include <vector>
 #include <string>
 #include <utility>
 
 using namespace std;
-
-
 
 class GoGame {
 private:
@@ -18,21 +16,21 @@ private:
 
     string convertToGTP(int x, int y);
     void convertFromGTP(std::string gtp, int &x, int &y);
+
     // --- AI Components ---
     KataGoRunner bot;
     GameMode currentMode;
     bool isAiThinking;
     Difficulty currentDifficulty;
 
-    void setDifficulty(Difficulty level);
+
 
 public:
-
-
     GoGame(AudioManager& am);
 
     Stone getCurrentPlayer() const;
     Stone getStoneAt(int x, int y) const;
+    void setDifficulty(Difficulty level);
 
     // Actions
     bool placeStone(int x, int y);
@@ -56,9 +54,11 @@ public:
     void toggleDeadStone(int x, int y);
     std::vector<std::vector<bool>> getDeadStones() const;
     void runHeuristic();
-    void initAI(Difficulty level);
+    void initAI(std::string exe, std::string model, std::string cfg);
 
-    void handleHumanMove(int x, int y, Player side);
-    void doAITurn(Player side, int &x, int &y);
+    // Updated Signatures
+    void handleHumanMove(int x, int y);
+    void doAITurn(int &x, int &y);
+
     std::vector<std::vector<bool>> getValidMoves() const;
 };

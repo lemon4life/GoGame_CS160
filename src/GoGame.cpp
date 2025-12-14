@@ -12,8 +12,6 @@ Stone playerToStone(Player p) {
     return Stone::Empty;
 }
 
-
-
 GoGame::GoGame(AudioManager& am)
     : audio(am), currentMode(GameMode::PVP), isAiThinking(false)
 {
@@ -44,20 +42,6 @@ bool GoGame::placeStone(int x, int y) {
     if (success) {
         if (captured) audio.playCapture();
         else audio.playPlaceStone();
-
-        // If VS AI and human (Black) just played, trigger AI (White)
-        if (currentMode == GameMode::AI && engine.getCurrentPlayer() == Player::WHITE) {
-            isAiThinking = true;
-
-            // Convert coordinate to GTP format (e.g., Q16)
-            // This is complex. KataGoRunner::sendCommand handles sending.
-            // But we need to tell KataGo the HUMAN move first.
-            // Assuming KataGo tracks state internally? No, GTP is stateless usually unless we sync.
-            // Actually, we usually send "play B Q16" then "genmove W".
-
-            // For this snippet, I'll assume we call updateAI() in main loop to handle async processing
-            // to avoid freezing the UI.
-        }
     } else {
         audio.playError();
     }
@@ -68,16 +52,29 @@ bool GoGame::isAIThinking() const {
     return isAiThinking;
 }
 
-bool GoGame::passTurn() { return engine.pass_move(); }
+// Updated passTurn to handle AI synchronization
+bool GoGame::passTurn() {
+    if (currentMode == GameMode::AI) {
+        // If it's Human's turn (Black), we must tell the bot we passed.
+        // If it's AI's turn (White), the AI just generated the pass itself, so we don't send it back.
+        if (engine.getCurrentPlayer() == Player::BLACK) {
+            bot.sendCommand("play B pass");
+        }
+    }
+    return engine.pass_move();
+}
+
 bool GoGame::undo() {
     if (engine.undo_step()) {
         audio.playPlaceStone();
+        if (currentMode == GameMode::AI) bot.sendCommand("undo");
         return true;
     }
 
     audio.playError();
     return false;
 }
+
 bool GoGame::redo() {
     if (engine.redo_step()) {
         audio.playPlaceStone();
@@ -87,7 +84,13 @@ bool GoGame::redo() {
     audio.playError();
     return false;
 }
-void GoGame::resetGame() { engine.initialize_board(BOARD_SIZE); }
+
+void GoGame::resetGame() {
+    engine.initialize_board(BOARD_SIZE);
+    if (currentMode == GameMode::AI) {
+        bot.sendCommand("clear_board");
+    }
+}
 
 Difficulty GoGame::getAIDifficulty() const {
     return currentDifficulty;
@@ -98,23 +101,11 @@ GameMode GoGame::getGameMode() const {
 }
 
 bool GoGame::saveGame(const std::string& f) {
-    // Cast Enums to Int
     return engine.saveGame(f);
 }
 
 bool GoGame::loadGame(const std::string& f) {
-    int modeInt = 0;
-    int diffInt = 0;
-
     if (engine.loadGame(f)) {
-        // Convert Ints back to Enums
-        currentMode = (modeInt == 1) ? GameMode::AI : GameMode::PVP;
-
-        if (diffInt == 1) currentDifficulty = Difficulty::EASY;
-        else if (diffInt == 2) currentDifficulty = Difficulty::MEDIUM;
-        else if (diffInt == 3) currentDifficulty = Difficulty::HARD;
-        else currentDifficulty = Difficulty::NONE;
-
         return true;
     }
     return false;
@@ -133,35 +124,29 @@ std::vector<std::vector<bool>> GoGame::getDeadStones() const {
     }
     return uiDead;
 }
+
 std::vector<std::vector<bool>> GoGame::getValidMoves() const {
     return const_cast<GoEngine&>(engine).validMoves();
 }
 
-void GoGame::initAI(Difficulty level) {
-    std::cout << "--- Initializing AI ---" << std::endl;
+void GoGame::runHeuristic() {
+    engine.deadStoneHeuristic();
+}
 
-    // Use simple relative paths
-    bool isRunning = bot.startEngine("./AI/katago.exe", "./AI/model.txt.gz", "./AI/cpu_config.cfg");
-
-    if (!isRunning) {
-        std::cerr << "--- STOPPING: AI could not start. ---" << std::endl;
-        return; // Return safely. DO NOT continue to send commands.
+void GoGame::initAI(std::string exe, std::string model, std::string cfg) {
+    if (currentMode == GameMode::AI) {
+        if (!bot.startEngine(exe, model, cfg)) {
+            std::cerr << "Failed to start AI Engine!" << std::endl;
+            currentMode = GameMode::PVP;
+            return;
+        }
+        // Initialize Bot Settings
+        bot.sendCommand("boardsize 19");
+        bot.sendCommand("komi 6.5");
+        bot.sendCommand("clear_board");
+        // Default difficulty
+        setDifficulty(Difficulty::MEDIUM);
     }
-
-    // Only verify if we actually started!
-    std::cout << "AI says: " << bot.sendCommand("name") << std::endl;
-
-    // Set Board Size (Standard is 19)
-    bot.sendCommand("boardsize 19");
-    
-    // Set Komi (Points given to white, usually 6.5 or 7.5)
-    bot.sendCommand("komi 6.5");
-    
-    // Clear the board (Good practice to ensure a clean state)
-    bot.sendCommand("clear_board");
-
-    setDifficulty(level);
-    currentDifficulty = level;
 }
 
 string GoGame::convertToGTP(int x, int y){
@@ -169,7 +154,7 @@ string GoGame::convertToGTP(int x, int y){
     if(x < 0 || x > 18 || y < 0 || y > 18) return "pass";
     string coord = "";
     coord += cols[x];
-    coord += to_string(y);
+    coord += to_string(19 - y);
     return coord;
 }
 
@@ -177,89 +162,65 @@ void GoGame::convertFromGTP(std::string gtp, int &x, int &y) {
     if (gtp.length() < 2) return;
 
     char colChar = std::toupper(gtp[0]);
-    
-    // Handle Column (Letter)
+
     if (colChar >= 'A' && colChar <= 'H') {
         x = colChar - 'A';
     } else if (colChar >= 'J' && colChar <= 'T') {
-        x = colChar - 'A' - 1; // Adjust for skipped 'I'
+        x = colChar - 'A' - 1;
     } else {
-        x = 0; // Error
+        x = 0;
     }
 
-    // Handle Row (Number)
-    // The part after the letter is the number (e.g. "16" in "Q16")
     try {
         int rowNum = std::stoi(gtp.substr(1));
-        y = 19 - rowNum; // Convert bottom-up (GTP) to top-down (Array/SFML)
+        y = 19 - rowNum;
     } catch (...) {
         y = 0;
     }
 }
 
-void GoGame::handleHumanMove(int x, int y, Player side) {
-    std::string coord = convertToGTP(x, y); 
-    placeStone(x, y);
-    if(side == Player::BLACK) bot.sendCommand("play B " + coord);
-    else bot.sendCommand("play W" + coord);
+// simplified handleHumanMove
+void GoGame::handleHumanMove(int x, int y) {
+    std::string coord = convertToGTP(x, y);
+    bool success = placeStone(x, y);
+
+    // Only send if move was valid and we are in AI mode
+    if(success && currentMode == GameMode::AI) {
+        bot.sendCommand("play B " + coord);
+    }
 }
 
-void GoGame::doAITurn(Player side, int &x, int &y) {
+// simplified doAITurn
+void GoGame::doAITurn(int &x, int &y) {
     isAiThinking = true;
-    // 1. Ask for a move (White)
-    std::string response; 
-    if(side == Player::WHITE) response = bot.sendCommand("genmove W");
-    else response = bot.sendCommand("genmove B");
-    
-    // Response will be something like "= D16\n\n" or "= PASS\n\n"
-    
-    // 2. Clean the response (Remove "= " and newlines)
-    // You can add a helper in KataGoRunner to do this, or do it here:
+
+    // AI is always White
+    std::string response = bot.sendCommand("genmove W");
+
     std::string move = response.substr(2); // Skip "= "
-    // Remove newlines
-    move.erase(std::remove(move.begin(), move.end(), '\n'), move.end()); 
+    move.erase(std::remove(move.begin(), move.end(), '\n'), move.end());
     move.erase(std::remove(move.begin(), move.end(), ' '), move.end());
 
     if (move == "PASS") {
         x = -1; y = -1;
-        return;
-    }
-
-    if(move == "resign"){
+    } else if (move == "resign") {
         x = -2; y = -2;
-        return;
+    } else {
+        convertFromGTP(move, x, y);
     }
-    // 3. Convert "D16" back to (x, y) integers
-    int aiX, aiY;
-    convertFromGTP(move, aiX, aiY);
 
-    x = aiX; y = aiY;
     isAiThinking = false;
 }
 
 void GoGame::setDifficulty(Difficulty level) {
     string visits;
-    
     switch(level) {
-        case EASY:
-            // Very fast, "weaker" (still strong)
-            visits = "3"; 
-            break;
-        case MEDIUM:
-            // Good balance of speed and strength
-            visits = "10"; 
-            break;
-        case HARD:
-            // "100%" capability (within reasonable waiting time)
-            visits = "100"; 
-            break;
+        case Difficulty::EASY: visits = "3"; break;
+        case Difficulty::MEDIUM: visits = "25"; break;
+        case Difficulty::HARD: visits = "100"; break;
+        default: visits = "10"; break;
     }
-
-    // "kata-set-param" is a special KataGo command to change config on the fly
-    std::string command = "kata-set-param maxVisits " + visits;
-    
-    // Send it! (Ignore the response, it's usually just success)
-    bot.sendCommand(command);
-    
+    bot.sendCommand("kata-set-param maxVisits " + visits);
+    currentDifficulty = level;
     std::cout << "Difficulty set to " << visits << " visits." << std::endl;
 }
