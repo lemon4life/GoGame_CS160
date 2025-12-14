@@ -33,7 +33,7 @@ void handleBoardClick(GoGame& game, const sf::Vector2i& mousePos, GoUIManager& u
                     game.handleHumanMove(gx, gy);
 
                     // Visual notification check
-                    if (game.getStoneAt(gx, gy) == Stone::Black) {
+                    if (game.getStoneAt(gx, gy) == Stone::White) {
                         ui.setNotification("Stone Placed");
                     } else {
                         ui.setNotification("Invalid move!");

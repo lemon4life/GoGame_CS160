@@ -57,7 +57,7 @@ bool GoGame::passTurn() {
     if (currentMode == GameMode::AI) {
         // If it's Human's turn (Black), we must tell the bot we passed.
         // If it's AI's turn (White), the AI just generated the pass itself, so we don't send it back.
-        if (engine.getCurrentPlayer() == Player::WHITE) {
+        if (engine.getCurrentPlayer() == Player::BLACK) {
             bot.sendCommand("play B pass");
         }
     }
@@ -67,7 +67,9 @@ bool GoGame::passTurn() {
 bool GoGame::undo() {
     if (engine.undo_step()) {
         audio.playPlaceStone();
-        if (currentMode == GameMode::AI) bot.sendCommand("undo");
+        if (currentMode == GameMode::AI) {
+            bot.sendCommand("undo");
+        }
         return true;
     }
 
@@ -247,4 +249,3 @@ void GoGame::setDifficulty(Difficulty level) {
     currentDifficulty = level;
     std::cout << "Difficulty set to " << visits << " visits." << std::endl;
 }
-
