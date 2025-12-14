@@ -57,7 +57,7 @@ bool GoGame::passTurn() {
     if (currentMode == GameMode::AI) {
         // If it's Human's turn (Black), we must tell the bot we passed.
         // If it's AI's turn (White), the AI just generated the pass itself, so we don't send it back.
-        if (engine.getCurrentPlayer() == Player::BLACK) {
+        if (engine.getCurrentPlayer() == Player::WHITE) {
             bot.sendCommand("play B pass");
         }
     }
